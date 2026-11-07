@@ -9,14 +9,13 @@ A Netflix-style catalogue of Pakistani dramas, in the same spirit as
   (Kabhi Main Kabhi Tum, Tere Bin, Sher, Meem Se Mohabbat, Jaan Nisar, Ishq Murshid).
 - **Cast, channel, year, status and TV timings** — grounded in Oct–Nov 2026
   trending reports (Neemopani, Filmibeat). No invented ratings or episode counts.
-- **Full episode lists — 702 episodes across all 20 dramas** (checked 7 Nov 2026).
+- **Full episode lists — 704 episodes across all 20 dramas** (checked 7 Nov 2026).
   Every drama's detail popup has an **Episodes** tab: every episode number,
   air date where verified (TVmaze, Wikipedia, Moviefone, harpalgeo.tv, official
   YouTube descriptions), a Latest/Finale badge. **Episodes play inside the site:**
-  295 of 702 episodes have a verified official YouTube video id and open in an
-  in-site player (8 dramas fully covered — Dar-e-Nijaat, Kafeel, Shar Pasand,
-  Bas Tera Saath Ho, Meem Se Mohabbat, Ishq Murshid, Muamma, Case No. 9 — plus
-  the newest verified episodes of Nashtar, Mitti De Baway, Hurmat and Mohabbat),
+  703 of 704 episodes have a verified official YouTube video id and open in an
+  in-site player (all 20 dramas covered — the only row still opening YouTube is
+  Mohabbat Episode 13, whose official video could not be verified yet),
   with a "Play all episodes" button that plays the channel's official playlist.
   Rows without a verified video (marked ↗) open a YouTube search on the
   channel's official uploads instead. Ongoing shows list the episodes aired so far.

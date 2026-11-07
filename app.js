@@ -49,7 +49,7 @@ const DRAMAS = [
     status: "Completed", schedule: "Fri & Sat, 8:00 PM", views: "8.1 TRP",
     synopsis: "A Geo favourite from March to August 2026, led by one of TV's most popular on-screen pairs.",
     poster: "posters/humrahi.jpg", rank: 8, progress: 0 },
-  { id: "meri-zindagi-hai-tu", title: "Meri Zindagi Hai Tu", urdu: "میری زندگی ہے تو", channel: "HUM TV", year: 2026,
+  { id: "meri-zindagi-hai-tu", title: "Meri Zindagi Hai Tu", urdu: "میری زندگی ہے تو", channel: "ARY Digital", year: 2025,
     cast: ["Hania Aamir", "Bilal Abbas Khan"], genre: "Romance • Drama",
     status: "Completed", schedule: "", views: "1.3B+ views — most-watched drama of 2026",
     synopsis: "The most-watched Pakistani drama of 2026. Hania Aamir and Bilal Abbas Khan in a love story that entered the all-time top 10 before ending in March.",
