@@ -34,6 +34,12 @@ A Netflix-style catalogue of Pakistani dramas, in the same spirit as
   Episodes tab has a **Mark all watched / Clear watched** button. A
   **Next episode** button under the player moves you on — and marks the
   episode you just finished as watched.
+- **Episode thumbnails** — every episode row shows its official YouTube
+  thumbnail (lazy-loaded; the episode number shows if a thumb can't load).
+  **🆕 New This Week** — the 5 ongoing dramas sorted by latest air date;
+  clicking a card plays its newest episode. The **hero** now drifts slowly
+  and shows the episode count + latest episode. Cards zoom on hover, and
+  section headings carry a red accent bar.
 - **Real posters** (downloaded from official channel art and poster sources),
   stored locally in `posters/`.
 - **Watch links go to the channels' official YouTube accounts**

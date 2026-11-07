@@ -206,6 +206,21 @@ function renderTonight() {
   $("#tonight-row").innerHTML = list.map(d => cardHTML(d)).join("");
   $$("#tonight-row .card").forEach(bindCard);
 }
+function renderNewThisWeek() {
+  const sec = $("#new-sec");
+  const list = DRAMAS.filter(d => d.status === "On Air" && EPISODES[d.id])
+    .sort((a, b) => latestDate(b) - latestDate(a));
+  if (!list.length) { sec.style.display = "none"; return; }
+  sec.style.display = "";
+  $("#new-row").innerHTML = list.map(d => {
+    const e = EPISODES[d.id];
+    const last = e.eps[e.eps.length - 1];
+    return last.v
+      ? cardHTML(d, { resume: "Play latest", resumeVid: last.v, resumeN: last.n })
+      : cardHTML(d);
+  }).join("");
+  $$("#new-row .card").forEach(bindCard);
+}
 function renderStats() {
   const tot = Object.values(EPISODES).reduce((s, e) => s + e.count, 0);
   const insite = Object.values(EPISODES).reduce((s, e) => s + e.eps.filter(ep => ep.v).length, 0);
@@ -432,7 +447,9 @@ function setHero(id) {
   $("#hero-kicker").textContent = `${d.channel} • ${d.year} • ${d.status === "On Air" ? "Trending #" + d.rank : "All-time favourite"}`;
   $("#hero-title").textContent = d.title;
   $("#hero-urdu").textContent = d.urdu;
-  $("#hero-meta").innerHTML = `${statusBadge(d)}${d.schedule ? `<span>${esc(d.schedule)}</span>` : ""}${d.views ? `<span class="views">${esc(d.views)}</span>` : ""}`;
+  const heps = epCount(d.id);
+  const hlat = (typeof EPISODES !== "undefined" && EPISODES[d.id] && EPISODES[d.id].latest) || "";
+  $("#hero-meta").innerHTML = `${statusBadge(d)}${d.schedule ? `<span>${esc(d.schedule)}</span>` : ""}${heps ? `<span>${heps} episodes</span>` : ""}${hlat ? `<span class="views">Latest: ${esc(hlat)}</span>` : ""}${d.views ? `<span class="views">${esc(d.views)}</span>` : ""}`;
   $("#hero-watch").onclick = () => openModal(d.id);
   const lb = $("#hero-list");
   lb.textContent = myList.includes(d.id) ? "✓ In My List" : "+ My List";
@@ -478,7 +495,10 @@ function episodesHTML(d) {
     const title = ep.t ? " — " + esc(ep.t) : "";
     const date = ep.d ? `<span class="ep-date">${esc(ep.d)}</span>` : "";
     const w = isWatched(d.id, ep.n);
-    const inner = `<span class="ep-num">${ep.n}</span>
+    const thumb = ep.v
+      ? `<span class="ep-visual"><span class="ep-num">${ep.n}</span><img class="ep-thumb" src="https://i.ytimg.com/vi/${ep.v}/hqdefault.jpg" alt="" loading="lazy" onerror="this.style.display='none'"></span>`
+      : `<span class="ep-visual"><span class="ep-num">${ep.n}</span></span>`;
+    const inner = `${thumb}
       <span class="ep-name">Episode ${ep.n}${title}</span>
       ${badge}${date}`;
     if (ep.v) {
@@ -634,6 +654,7 @@ function init() {
   renderRows();
   renderGrid();
   renderTonight();
+  renderNewThisWeek();
   renderStats();
   setHero(HERO_IDS[0]);
   $("#hero-thumbs").innerHTML = HERO_IDS.map(id => {
