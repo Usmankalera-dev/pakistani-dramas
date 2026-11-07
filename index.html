@@ -26,15 +26,16 @@
     <button class="nav-item active" data-view="browse"><span class="ico">🧭</span>Browse</button>
     <button class="nav-item" data-view="trending"><span class="ico">📈</span>Trending</button>
     <button class="nav-item" data-view="onair"><span class="ico">📺</span>On Air Now</button>
+    <button class="nav-item" data-view="actors"><span class="ico">🎭</span>Actors</button>
     <button class="nav-item" data-view="mylist"><span class="ico">🔖</span>My List <span class="count" id="mylist-count" style="display:none">0</span></button>
   </nav>
 
   <p class="side-label">Following</p>
   <div class="channels">
-    <button class="chan-row" data-channel="ARY Digital"><span class="avatar" style="--c:#e50914">A</span>ARY Digital<i class="live-dot"></i></button>
-    <button class="chan-row" data-channel="HUM TV"><span class="avatar" style="--c:#7b2ff7">H</span>HUM TV<i class="live-dot"></i></button>
-    <button class="chan-row" data-channel="Geo Entertainment"><span class="avatar" style="--c:#00a651">G</span>Geo Entertainment<i class="live-dot"></i></button>
-    <button class="chan-row" data-channel="Green Entertainment"><span class="avatar" style="--c:#00b3a6">G</span>Green Entertainment<i class="live-dot"></i></button>
+    <button class="chan-row" data-channel="ARY Digital"><span class="avatar" style="--c:#fff"><img src="logos/ary.png" alt="ARY Digital logo"></span>ARY Digital<i class="live-dot"></i></button>
+    <button class="chan-row" data-channel="HUM TV"><span class="avatar" style="--c:#fff"><img src="logos/hum.jpg" alt="HUM TV logo"></span>HUM TV<i class="live-dot"></i></button>
+    <button class="chan-row" data-channel="Geo Entertainment"><span class="avatar" style="--c:#fff"><img src="logos/geo.png" alt="Geo Entertainment logo"></span>Geo Entertainment<i class="live-dot"></i></button>
+    <button class="chan-row" data-channel="Green Entertainment"><span class="avatar" style="--c:#fff"><img src="logos/green.jpg" alt="Green Entertainment logo"></span>Green Entertainment<i class="live-dot"></i></button>
   </div>
 
   <div class="side-foot">
@@ -86,6 +87,13 @@
     </div>
   </section>
 
+  <div class="stats-bar" id="stats-bar"></div>
+
+  <section class="row-sec" id="tonight-sec" style="display:none">
+    <div class="sec-head"><h2 id="tonight-title">📺 Tonight on TV</h2></div>
+    <div id="tonight-row" class="row"></div>
+  </section>
+
   <section class="row-sec">
     <div class="sec-head"><h2>Continue Watching</h2><button class="see-all" data-goto="browse">See all ›</button></div>
     <div id="cw-row" class="row"></div>
@@ -94,6 +102,11 @@
   <section class="row-sec">
     <div class="sec-head"><h2>🔥 Trending Now</h2><button class="see-all" data-goto="trending">See all ›</button></div>
     <div id="tr-row" class="row rank-row"></div>
+  </section>
+
+  <section class="row-sec">
+    <div class="sec-head"><h2>⭐ Popular Actors</h2><button class="see-all" data-goto="actors">See all ›</button></div>
+    <div id="actors-row" class="row"></div>
   </section>
 
   <section class="row-sec" id="all">
@@ -119,10 +132,10 @@
   <footer>
     <p><b>PakDrama</b> — a fan guide to Pakistani dramas. Posters, titles and shows belong to their channels (ARY Digital, HUM TV, Geo Entertainment, Green Entertainment).</p>
     <p>Watch episodes on the official YouTube channels:
-      <a href="https://www.youtube.com/@ARYDigital" target="_blank" rel="noopener">ARY Digital</a> •
-      <a href="https://www.youtube.com/@HUMTV" target="_blank" rel="noopener">HUM TV</a> •
-      <a href="https://www.youtube.com/@HarPalGeo" target="_blank" rel="noopener">Har Pal Geo</a> •
-      <a href="https://www.youtube.com/@GreenEntertainment" target="_blank" rel="noopener">Green Entertainment</a>
+      <a href="https://www.youtube.com/@ARYDigital" target="_blank" rel="noopener"><img class="foot-logo" src="logos/ary.png" alt="">ARY Digital</a> •
+      <a href="https://www.youtube.com/@HUMTV" target="_blank" rel="noopener"><img class="foot-logo" src="logos/hum.jpg" alt="">HUM TV</a> •
+      <a href="https://www.youtube.com/@HarPalGeo" target="_blank" rel="noopener"><img class="foot-logo" src="logos/geo.png" alt="">Har Pal Geo</a> •
+      <a href="https://www.youtube.com/@GreenEntertainment" target="_blank" rel="noopener"><img class="foot-logo" src="logos/green.jpg" alt="">Green Entertainment</a>
     </p>
     <p class="made">Made by Usman Kalera • November 2026</p>
   </footer>

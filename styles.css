@@ -40,7 +40,10 @@ img { display: block; max-width: 100%; }
 }
 .chan-row:hover { background: var(--panel2); color: #fff; }
 .avatar { width: 34px; height: 34px; border-radius: 50%; background: var(--c, #e50914); color: #fff;
-  display: grid; place-items: center; font-weight: 800; font-size: 15px; flex: none; }
+  display: grid; place-items: center; font-weight: 800; font-size: 15px; flex: none; overflow: hidden; }
+.avatar img { width: 100%; height: 100%; object-fit: contain; display: block; padding: 2px; }
+.chan-logo { width: 22px; height: 22px; object-fit: contain; border-radius: 5px; vertical-align: -5px; margin-right: 6px; background: #fff; }
+.foot-logo { width: 20px; height: 20px; object-fit: contain; border-radius: 5px; vertical-align: -4px; margin-right: 5px; background: #fff; }
 .live-dot { margin-left: auto; width: 8px; height: 8px; border-radius: 50%; background: var(--green);
   box-shadow: 0 0 0 3px rgba(34, 197, 94, .18); }
 .side-foot { margin-top: auto; padding: 18px 10px 4px; color: var(--muted); font-size: 12.5px; line-height: 1.55; }
@@ -115,6 +118,19 @@ main { margin-left: 252px; min-height: 100vh; }
 .thumb { width: 92px; height: 56px; border-radius: 10px; overflow: hidden; padding: 0; border: 2px solid transparent; opacity: .65; }
 .thumb img { width: 100%; height: 100%; object-fit: cover; }
 .thumb.active { border-color: var(--red); opacity: 1; }
+
+/* ---------- stats bar / tonight / actors ---------- */
+.stats-bar { display: flex; justify-content: center; gap: 28px; flex-wrap: wrap;
+  padding: 15px 20px; border-bottom: 1px solid var(--line); color: var(--muted);
+  font-size: 14px; font-weight: 600; }
+.stats-bar b { color: #fff; font-size: 16px; margin-right: 3px; }
+.actor-count { position: absolute; left: 10px; bottom: 10px; background: var(--red); color: #fff;
+  font-size: 12px; font-weight: 700; padding: 4px 10px; border-radius: 999px; }
+.actor-list { display: flex; flex-direction: column; gap: 10px; }
+.actor-list .mini { display: flex; align-items: center; gap: 12px; text-align: left; }
+.actor-list .mini img { width: 62px; height: 92px; flex: none; border-radius: 8px; }
+.actor-list .mini span { padding: 10px 12px 10px 0; font-size: 14px; line-height: 1.4; }
+.actor-list .mini small { display: block; color: var(--muted); font-size: 12.5px; font-weight: 500; margin-top: 3px; }
 
 /* ---------- rows / cards ---------- */
 .row-sec { padding: 26px 34px 6px; }

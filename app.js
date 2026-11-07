@@ -2,10 +2,10 @@
    Cast / channel / schedule only where reported. Watch links go to the channels'
    official YouTube accounts — episodes are uploaded there after TV airing. */
 const CHANNELS = {
-  "ARY Digital": { yt: "https://www.youtube.com/@ARYDigital", color: "#e50914", short: "ARY" },
-  "HUM TV": { yt: "https://www.youtube.com/@HUMTV", color: "#7b2ff7", short: "HUM" },
-  "Geo Entertainment": { yt: "https://www.youtube.com/@HarPalGeo", color: "#00a651", short: "GEO" },
-  "Green Entertainment": { yt: "https://www.youtube.com/@GreenEntertainment", color: "#00b3a6", short: "GREEN" },
+  "ARY Digital": { yt: "https://www.youtube.com/@ARYDigital", color: "#e50914", short: "ARY", logo: "logos/ary.png" },
+  "HUM TV": { yt: "https://www.youtube.com/@HUMTV", color: "#7b2ff7", short: "HUM", logo: "logos/hum.jpg" },
+  "Geo Entertainment": { yt: "https://www.youtube.com/@HarPalGeo", color: "#00a651", short: "GEO", logo: "logos/geo.png" },
+  "Green Entertainment": { yt: "https://www.youtube.com/@GreenEntertainment", color: "#00b3a6", short: "GREEN", logo: "logos/green.jpg" },
 };
 
 const DRAMAS = [
@@ -114,6 +114,105 @@ const DRAMAS = [
 const HERO_IDS = ["dar-e-nijaat", "kabhi-main-kabhi-tum", "tere-bin", "sher"];
 const CW_IDS = ["meri-zindagi-hai-tu", "kabhi-main-kabhi-tum", "tere-bin", "sher"];
 
+/* ---------- actors (derived from the verified cast lists) ---------- */
+function epCount(id) { const e = (typeof EPISODES !== "undefined" && EPISODES[id]) || null; return e ? e.count : 0; }
+const ACTORS = (() => {
+  const m = {};
+  DRAMAS.forEach(d => d.cast.forEach(name => {
+    m[name] = m[name] || { name, dramas: [] };
+    m[name].dramas.push(d);
+  }));
+  const list = Object.values(m).map(a => {
+    a.dramas.sort((x, y) => x.rank - y.rank);
+    a.top = a.dramas[0];
+    a.channels = [...new Set(a.dramas.map(d => d.channel))];
+    a.totalEps = a.dramas.reduce((s, d) => s + epCount(d.id), 0);
+    a.years = [Math.min(...a.dramas.map(d => d.year)), Math.max(...a.dramas.map(d => d.year))];
+    return a;
+  });
+  list.sort((a, b) => b.dramas.length - a.dramas.length || a.top.rank - b.top.rank);
+  return list;
+})();
+
+function actorCardHTML(a) {
+  return `<article class="card actor-card" data-actor="${esc(a.name)}" tabindex="0" role="button" aria-label="${esc(a.name)}">
+    <div class="poster"><img src="${a.top.poster}" alt="${esc(a.name)}" loading="lazy" onerror="this.closest('.poster').classList.add('noimg');this.remove();">
+      <span class="poster-title">${esc(a.name)}</span>
+      <span class="actor-count">${a.dramas.length} drama${a.dramas.length === 1 ? "" : "s"}</span>
+    </div>
+    <div class="card-body">
+      <h3>${esc(a.name)}</h3>
+      <p class="meta">${a.channels.map(esc).join(" • ")} • ${a.totalEps} episodes</p>
+      <p class="meta">Top: ${esc(a.top.title)} (${a.top.year})</p>
+    </div>
+  </article>`;
+}
+
+function openActor(name) {
+  const a = ACTORS.find(x => x.name === name);
+  if (!a) return;
+  modalOpen = "actor:" + name;
+  const rows = a.dramas.map(d => {
+    const eps = epCount(d.id);
+    return `<button class="mini actor-drama" data-id="${d.id}"><img src="${d.poster}" alt="" loading="lazy" onerror="this.remove();"><span>${esc(d.title)} <small>${d.year} · ${esc(d.channel)}${eps ? " · " + eps + " episodes" : ""} · ${d.status}</small></span></button>`;
+  }).join("");
+  $("#modal-body").innerHTML = `
+    <div class="modal-poster"><img src="${a.top.poster}" alt="${esc(a.name)}" onerror="this.closest('.modal-poster').classList.add('noimg');this.remove();">
+      <span class="poster-title">${esc(a.name)}</span></div>
+    <div class="modal-info">
+      <h2>${esc(a.name)}</h2>
+      <div class="modal-meta"><span>${a.dramas.length} drama${a.dramas.length === 1 ? "" : "s"} on PakDrama</span><span>${a.channels.map(esc).join(" • ")}</span><span>${a.years[0]}${a.years[1] !== a.years[0] ? "–" + a.years[1] : ""}</span><span>${a.totalEps} episodes</span></div>
+      <p class="syn">Filmography on PakDrama — every drama ${esc(a.name)} stars in on this site, with channel, year and episode count.</p>
+      <div class="modal-actions">
+        <button class="btn watch" id="actor-view-all">▶ View all their dramas</button>
+      </div>
+      <h4>Dramas</h4>
+      <div class="actor-list">${rows}</div>
+      <p class="fine">Cast details come from the drama listings on this site. Tap a drama to open it.</p>
+    </div>`;
+  $("#modal").classList.add("open");
+  document.body.style.overflow = "hidden";
+  $("#actor-view-all").onclick = () => {
+    closeModal();
+    state.view = "browse"; state.channel = "All"; syncChips();
+    $("#search").value = a.name; state.query = a.name.toLowerCase();
+    renderGrid();
+    $("#all").scrollIntoView({ behavior: "smooth" });
+  };
+  $$("#modal-body .actor-drama").forEach(b => b.addEventListener("click", () => openModal(b.dataset.id)));
+  $("#modal").scrollTop = 0;
+}
+
+/* ---------- tonight on TV + stats (computed from schedules & data) ---------- */
+const DAY_ABBR = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+const DAY_FULL = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+function airingOn(dayIdx) {
+  const abbr = DAY_ABBR[dayIdx];
+  return DRAMAS.filter(d => d.status === "On Air" && d.schedule && d.schedule.includes(abbr));
+}
+function renderTonight() {
+  const today = new Date().getDay();
+  let day = today, list = airingOn(today), label = "Tonight";
+  if (!list.length) {
+    for (let i = 1; i <= 7; i++) {
+      const d = (today + i) % 7, l = airingOn(d);
+      if (l.length) { day = d; list = l; label = "Next: " + DAY_FULL[d]; break; }
+    }
+  }
+  const sec = $("#tonight-sec");
+  if (!list.length) { sec.style.display = "none"; return; }
+  sec.style.display = "";
+  $("#tonight-title").textContent = label === "Tonight" ? "📺 Tonight on TV — " + DAY_FULL[day] : "📺 " + label + " on TV";
+  $("#tonight-row").innerHTML = list.map(d => cardHTML(d)).join("");
+  $$("#tonight-row .card").forEach(bindCard);
+}
+function renderStats() {
+  const tot = Object.values(EPISODES).reduce((s, e) => s + e.count, 0);
+  const insite = Object.values(EPISODES).reduce((s, e) => s + e.eps.filter(ep => ep.v).length, 0);
+  const chans = [...new Set(DRAMAS.map(d => d.channel))].length;
+  $("#stats-bar").innerHTML = `<span><b>${DRAMAS.length}</b> dramas</span><span><b>${tot}</b> episodes</span><span><b>${chans}</b> channels</span><span><b>${insite}</b> play in-site</span>`;
+}
+
 const state = { view: "browse", query: "", channel: "All", sort: "popular" };
 let myList = [];
 try { myList = JSON.parse(localStorage.getItem("pakdrama-mylist") || "[]"); } catch (e) { myList = []; }
@@ -130,8 +229,6 @@ function statusBadge(d) {
     ? '<span class="pill onair"><i class="dot"></i>On Air</span>'
     : '<span class="pill done">Completed</span>';
 }
-
-function epCount(id) { const e = (typeof EPISODES !== "undefined" && EPISODES[id]) || null; return e ? e.count : 0; }
 
 function cardHTML(d, opts) {
   opts = opts || {};
@@ -173,8 +270,23 @@ function filtered() {
 }
 
 function renderGrid() {
-  const list = filtered();
   const grid = $("#grid");
+  const showChips = state.view !== "actors";
+  $("#sort").style.display = showChips ? "" : "none";
+  $(".chips").style.display = showChips ? "" : "none";
+  if (state.view === "actors") {
+    $("#grid-title").textContent = "Actors";
+    $("#grid-count").textContent = ACTORS.length + " actors";
+    $("#empty").style.display = "none";
+    grid.innerHTML = ACTORS.map(actorCardHTML).join("");
+    $$("#grid .actor-card").forEach(c => {
+      c.addEventListener("click", () => openActor(c.dataset.actor));
+      c.addEventListener("keydown", e => { if (e.key === "Enter") openActor(c.dataset.actor); });
+    });
+    updateCounts();
+    return;
+  }
+  const list = filtered();
   const titles = { browse: "All Dramas", trending: "Trending Now", mylist: "My List", onair: "On Air Now" };
   $("#grid-title").textContent = titles[state.view] || "All Dramas";
   $("#grid-count").textContent = list.length + (list.length === 1 ? " drama" : " dramas");
@@ -191,6 +303,11 @@ function renderRows() {
   const tr = DRAMAS.filter(d => d.rank <= 10).sort((a, b) => a.rank - b.rank);
   $("#tr-row").innerHTML = tr.map((d, i) => cardHTML(d, { rank: i + 1 })).join("");
   $$("#tr-row .card").forEach(bindCard);
+  $("#actors-row").innerHTML = ACTORS.slice(0, 8).map(actorCardHTML).join("");
+  $$("#actors-row .actor-card").forEach(c => {
+    c.addEventListener("click", () => openActor(c.dataset.actor));
+    c.addEventListener("keydown", e => { if (e.key === "Enter") openActor(c.dataset.actor); });
+  });
 }
 
 function updateCounts() {
@@ -218,7 +335,7 @@ function toggleList(id) {
   else { myList.push(id); toast("Added to My List ✓"); }
   saveList();
   renderGrid(); renderRows();
-  if (modalOpen) openModal(id, true);
+  if (modalOpen && byId(modalOpen)) openModal(id, true);
 }
 
 function toast(msg) {
@@ -341,7 +458,7 @@ function openModal(id, keep) {
     <div class="modal-info">
       <h2>${esc(d.title)}</h2>
       <p class="urdu big">${esc(d.urdu)}</p>
-      <div class="modal-meta">${statusBadge(d)}<span class="chan" style="--c:${chanColor(d.channel)}">${esc(d.channel)}</span><span>${d.year}</span><span>${esc(d.genre)}</span></div>
+      <div class="modal-meta">${statusBadge(d)}<span class="chan" style="--c:${chanColor(d.channel)}"><img class="chan-logo" src="${ch.logo}" alt="">${esc(d.channel)}</span><span>${d.year}</span><span>${esc(d.genre)}</span></div>
       <div class="tabs" role="tablist">
         <button class="tab active" data-tab="details">Details</button>
         <button class="tab" data-tab="episodes">Episodes <span class="ep-count">${epCount(d.id)}</span></button>
@@ -356,7 +473,7 @@ function openModal(id, keep) {
           <button class="btn ghost" id="modal-list">${myList.includes(d.id) ? "✓ In My List" : "+ My List"}</button>
         </div>
         <p class="fine">Episodes air on TV first, then on the channel's official YouTube. This site lists dramas — it does not host episodes.</p>
-        ${same.length ? `<h4>More on ${esc(d.channel)}</h4><div class="modal-more">${same.map(x => `<button class="mini" data-id="${x.id}"><img src="${x.poster}" alt="" loading="lazy" onerror="this.remove();"><span>${esc(x.title)}</span></button>`).join("")}</div>` : ""}
+        ${same.length ? `<h4><img class="chan-logo" src="${ch.logo}" alt=""> More on ${esc(d.channel)}</h4><div class="modal-more">${same.map(x => `<button class="mini" data-id="${x.id}"><img src="${x.poster}" alt="" loading="lazy" onerror="this.remove();"><span>${esc(x.title)}</span></button>`).join("")}</div>` : ""}
       </div>
       <div class="tab-pane" id="tab-episodes" hidden>${episodesHTML(d)}</div>
     </div>`;
@@ -385,6 +502,8 @@ function closeModal() {
 function init() {
   renderRows();
   renderGrid();
+  renderTonight();
+  renderStats();
   setHero(HERO_IDS[0]);
   $("#hero-thumbs").innerHTML = HERO_IDS.map(id => {
     const d = byId(id);
@@ -417,7 +536,7 @@ function init() {
   $("#search").addEventListener("input", e => {
     state.query = e.target.value.trim();
     $("#search-clear").style.display = state.query ? "" : "none";
-    if (state.view === "mylist" || state.view === "trending" || state.view === "onair") { state.view = "browse"; }
+    if (state.view === "mylist" || state.view === "trending" || state.view === "onair" || state.view === "actors") { state.view = "browse"; }
     renderGrid();
   });
   $("#search-clear").addEventListener("click", () => {
