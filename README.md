@@ -44,6 +44,11 @@ A Netflix-style catalogue of Pakistani dramas, in the same spirit as
   (today highlighted; tap a drama to open it). **🔔 Follow** an ongoing drama
   and the bell shows its next airing. The modal suggests **🎭 More like this**
   from shared cast, and the Actors directory has a **search box**.
+- **⭐ Your ratings** — rate any drama 1–5 stars in its modal (saved in your
+  browser, shown on its card, with a **Top rated** sort). **🎲 Surprise me**
+  in the topbar opens a random drama. **📊 My Stats** in My List shows your
+  episodes watched, dramas fully watched and ≈ hours. Ongoing dramas show
+  their **next episode** date in the modal.
 - **Real posters** (downloaded from official channel art and poster sources),
   stored locally in `posters/`.
 - **Watch links go to the channels' official YouTube accounts**

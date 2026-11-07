@@ -319,6 +319,11 @@ function setWatched(id, n, on) {
   if (!arr.length) delete watched[id];
   saveWatched();
 }
+/* ---------- your star ratings (saved in browser) ---------- */
+let ratings = {};
+try { ratings = JSON.parse(localStorage.getItem("pakdrama-ratings") || "{}"); } catch (e) { ratings = {}; }
+function saveRatings() { try { localStorage.setItem("pakdrama-ratings", JSON.stringify(ratings)); } catch (e) {} }
+
 function refreshWatchedUI(id) {
   const e = (typeof EPISODES !== "undefined" && EPISODES[id]) || null;
   if (!e) return;
@@ -367,7 +372,7 @@ function cardHTML(d, opts) {
     <div class="card-body">
       <h3>${esc(d.title)}</h3>
       <p class="urdu">${esc(d.urdu)}</p>
-      <p class="meta"><span class="chan" style="--c:${chanColor(d.channel)}">${esc(d.channel)}</span> • ${d.year}${eps ? ` • <span class="epn">${eps} episode${eps === 1 ? "" : "s"}</span>` : ""}${w ? ` • <span class="watched-n">${w}/${eps} watched</span>` : ""}</p>
+      <p class="meta"><span class="chan" style="--c:${chanColor(d.channel)}">${esc(d.channel)}</span> • ${d.year}${eps ? ` • <span class="epn">${eps} episode${eps === 1 ? "" : "s"}</span>` : ""}${w ? ` • <span class="watched-n">${w}/${eps} watched</span>` : ""}${ratings[d.id] ? ` • <span class="my-rating">★ ${ratings[d.id]}/5</span>` : ""}</p>
       <div class="card-foot">${statusBadge(d)}${d.status === "On Air" ? `<span class="newep">● New Ep ${eps}</span>` : ""}${d.schedule && d.status === "On Air" ? `<span class="sched">${esc(d.schedule)}</span>` : ""}${opts.resume ? `<span class="resume">▶ ${esc(opts.resume)}</span>` : ""}</div>
     </div>
   </article>`;
@@ -397,6 +402,7 @@ function filtered() {
   if (state.sort === "newest") list.sort((a, b) => b.year - a.year || a.rank - b.rank);
   if (state.sort === "az") list.sort((a, b) => a.title.localeCompare(b.title));
   if (state.sort === "recent") list.sort((a, b) => latestDate(b) - latestDate(a) || a.rank - b.rank);
+  if (state.sort === "rated") list.sort((a, b) => (ratings[b.id] || 0) - (ratings[a.id] || 0) || a.rank - b.rank);
   return list;
 }
 
@@ -420,6 +426,14 @@ function renderGrid() {
     updateCounts();
     return;
   }
+  const ms = $("#mylist-stats");
+  if (state.view === "mylist") {
+    const totW = Object.values(watched).reduce((s, a) => s + a.length, 0);
+    const done = DRAMAS.filter(d => { const e = EPISODES[d.id]; return e && watchedCount(d.id) >= e.count; }).length;
+    const hrs = Math.round(totW * 40 / 60);
+    ms.style.display = "";
+    ms.innerHTML = `📊 You watched <b>${totW}</b> episode${totW === 1 ? "" : "s"} · <b>${done}</b> drama${done === 1 ? "" : "s"} fully watched · ≈ <b>${hrs}h</b> of drama`;
+  } else ms.style.display = "none";
   const list = filtered();
   const titles = { browse: "All Dramas", trending: "Trending Now", mylist: "My List", onair: "On Air Now" };
   $("#grid-title").textContent = titles[state.view] || "All Dramas";
@@ -679,6 +693,8 @@ function openModal(id, keep) {
         ${d.schedule ? `<p class="line"><b>${d.status === "On Air" ? "Airs" : "Aired"}:</b> ${esc(d.schedule)} (Pakistan time)</p>` : ""}
         ${d.cast.length ? `<p class="line"><b>Cast:</b> ${d.cast.map(esc).join(", ")}</p>` : ""}
         ${d.views ? `<p class="line"><b>Buzz:</b> ${esc(d.views)}</p>` : ""}
+        ${d.status === "On Air" && nextAir(d) ? `<p class="line"><b>Next episode:</b> ${fmtAir(nextAir(d))}</p>` : ""}
+        <div class="rate-row"><span>Your rating:</span><span class="stars" id="modal-stars">${[1, 2, 3, 4, 5].map(n => `<button class="star${(ratings[d.id] || 0) >= n ? " on" : ""}" data-n="${n}" aria-label="${n} stars">★</button>`).join("")}</span><span class="rate-label" id="rate-label">${ratings[d.id] ? ratings[d.id] + "/5" : "Tap a star"}</span></div>
         <p class="syn">${esc(d.synopsis)}</p>
         <div class="modal-actions">
           <a class="btn watch" href="${ch.yt}" target="_blank" rel="noopener">▶ Watch on YouTube — ${esc(d.channel)}</a>
@@ -698,6 +714,15 @@ function openModal(id, keep) {
   $("#modal-list").onclick = () => toggleList(d.id);
   const fo = $("#modal-follow");
   if (fo) fo.onclick = () => { toggleFollow(d.id); fo.textContent = isFollowing(d.id) ? "✓ Following" : "🔔 Follow"; };
+  $$("#modal-stars .star").forEach(s => s.addEventListener("click", () => {
+    ratings[d.id] = Number(s.dataset.n);
+    saveRatings();
+    $$("#modal-stars .star").forEach(x => x.classList.toggle("on", Number(x.dataset.n) <= ratings[d.id]));
+    const rl = $("#rate-label");
+    if (rl) rl.textContent = ratings[d.id] + "/5";
+    renderRows();
+    renderGrid();
+  }));
   const sh = $("#modal-share");
   if (sh) sh.onclick = () => copyText(shareURL(d));
   try { history.replaceState(null, "", "#" + id); } catch (e) {}
@@ -730,6 +755,10 @@ function init() {
   renderBell();
   renderStats();
   $("#actor-search").addEventListener("input", () => renderGrid());
+  $("#surprise").addEventListener("click", () => {
+    const d = DRAMAS[Math.floor(Math.random() * DRAMAS.length)];
+    openModal(d.id);
+  });
   setHero(HERO_IDS[0]);
   $("#hero-thumbs").innerHTML = HERO_IDS.map(id => {
     const d = byId(id);

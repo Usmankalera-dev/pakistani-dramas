@@ -53,6 +53,7 @@
       <input id="search" type="search" placeholder="Search dramas, actors, channels…" autocomplete="off">
       <button id="search-clear" aria-label="Clear search" style="display:none">✕</button>
     </div>
+    <button id="surprise" aria-label="Surprise me" title="Surprise me">🎲</button>
     <div id="bell-wrap">
       <button id="bell" aria-label="Notifications">🔔<i class="bell-dot"></i></button>
       <div id="bell-drop">
@@ -127,6 +128,7 @@
         <option value="newest">Newest</option>
         <option value="az">A – Z</option>
         <option value="recent">Recently updated</option>
+        <option value="rated">Top rated</option>
       </select>
       <input id="actor-search" type="search" placeholder="🔍 Search actors…" aria-label="Search actors" style="display:none">
     </div>
@@ -137,6 +139,7 @@
       <button class="chip" data-channel="Geo Entertainment">Geo</button>
       <button class="chip" data-channel="Green Entertainment">Green</button>
     </div>
+    <p id="mylist-stats" class="mylist-stats" style="display:none"></p>
     <div id="grid" class="grid"></div>
     <p id="empty" style="display:none">No dramas match that search. Try another name, actor or channel.</p>
   </section>

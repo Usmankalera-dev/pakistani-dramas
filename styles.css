@@ -367,3 +367,17 @@ footer .made { margin-top: 8px; color: #c9c9d6; }
 .unfollow { background: none; border: 0; color: var(--red); cursor: pointer; font-size: 12px; padding: 0; margin-left: 6px; }
 @media (max-width: 900px) { .sched-row { grid-template-columns: repeat(4, 1fr); } }
 @media (max-width: 520px) { .sched-row { grid-template-columns: repeat(2, 1fr); } #actor-search { width: 100%; } }
+
+/* ---------- upgrade round 6: ratings, surprise, my stats ---------- */
+#surprise { background: var(--panel2); border: 1px solid var(--line); color: var(--text);
+  width: 42px; height: 42px; border-radius: 50%; font-size: 18px; cursor: pointer; flex: none; }
+#surprise:hover { border-color: var(--red); }
+.rate-row { display: flex; align-items: center; gap: 10px; margin: 12px 0 4px; }
+.rate-row > span:first-child { font-weight: 700; font-size: 14px; }
+.stars { display: flex; gap: 2px; }
+.stars .star { background: none; border: 0; color: var(--muted); font-size: 22px; cursor: pointer; padding: 0 2px; line-height: 1; }
+.stars .star.on { color: #f5c518; }
+.rate-label { color: var(--muted); font-size: 13px; }
+.my-rating { color: #f5c518; font-weight: 700; }
+.mylist-stats { color: var(--muted); font-size: 14px; margin: 0 0 12px; }
+.mylist-stats b { color: var(--text); }
