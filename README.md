@@ -55,6 +55,10 @@ A Netflix-style catalogue of Pakistani dramas, in the same spirit as
   file. **Header** has the PakDrama logo in the topbar on phones (tap it to
   go home) plus a red accent line. **Footer** is now 3 columns — About +
   Share, Browse links, Channels — with a live stats line.
+- **Layout fixed (mobile)** — the topbar no longer pushes Surprise + bell
+  off the phone screen (search is now full-width on its own row); the
+  Trending rank numbers sit inside the posters instead of over the titles;
+  the stats bar is a clean 2×2 grid on phones.
 - **Real posters** (downloaded from official channel art and poster sources),
   stored locally in `posters/`.
 - **Watch links go to the channels' official YouTube accounts**

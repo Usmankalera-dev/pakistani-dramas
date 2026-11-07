@@ -364,8 +364,8 @@ function cardHTML(d, opts) {
   const w = watchedCount(d.id);
   const prog = w ? `<div class="prog"><i style="width:${Math.round(w / eps * 100)}%"></i></div>` : "";
   return `<article class="card" data-id="${d.id}"${opts.resumeVid ? ` data-rvid="${opts.resumeVid}" data-rn="${opts.resumeN}"` : ""}${opts.resumePl ? ` data-rpl="1"` : ""} tabindex="0" role="button" aria-label="${esc(d.title)}">
-    ${rank}
     <div class="poster"><img src="${d.poster}" alt="${esc(d.title)} poster" loading="lazy" onerror="this.closest('.poster').classList.add('noimg');this.remove();">
+      ${rank}
       <span class="poster-title">${esc(d.title)}<small>${esc(d.urdu)}</small></span>
       <button class="card-play" aria-label="Open ${esc(d.title)}">▶</button>
       <button class="card-list ${inList ? "on" : ""}" data-list="${d.id}" aria-label="My List">${inList ? "✓" : "+"}</button>
