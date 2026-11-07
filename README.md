@@ -29,6 +29,11 @@ A Netflix-style catalogue of Pakistani dramas, in the same spirit as
   **Episode filter** inside the Episodes tab (find by number or date).
   **Share** any drama (copy link / WhatsApp) — shared links open that drama
   directly (`#drama-id`). On-Air cards show a **New Ep** chip.
+- **Watched episodes** — tick any episode as watched (saved in the browser);
+  cards show real progress (`12/39 watched` with a progress bar) and the
+  Episodes tab has a **Mark all watched / Clear watched** button. A
+  **Next episode** button under the player moves you on — and marks the
+  episode you just finished as watched.
 - **Real posters** (downloaded from official channel art and poster sources),
   stored locally in `posters/`.
 - **Watch links go to the channels' official YouTube accounts**

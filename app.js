@@ -230,6 +230,38 @@ function saveContinue(id, n, vid) {
   renderRows();
 }
 
+/* ---------- watched episodes (real progress) ---------- */
+let watched = {};
+try { watched = JSON.parse(localStorage.getItem("pakdrama-watched") || "{}"); } catch (e) { watched = {}; }
+function saveWatched() { try { localStorage.setItem("pakdrama-watched", JSON.stringify(watched)); } catch (e) {} }
+function watchedCount(id) { return (watched[id] || []).length; }
+function isWatched(id, n) { return (watched[id] || []).indexOf(Number(n)) >= 0; }
+function setWatched(id, n, on) {
+  const arr = watched[id] || (watched[id] = []);
+  const i = arr.indexOf(Number(n));
+  if (on && i < 0) arr.push(Number(n));
+  if (!on && i >= 0) arr.splice(i, 1);
+  if (!arr.length) delete watched[id];
+  saveWatched();
+}
+function refreshWatchedUI(id) {
+  const e = (typeof EPISODES !== "undefined" && EPISODES[id]) || null;
+  if (!e) return;
+  const total = e.count;
+  const c = watchedCount(id);
+  const cnt = $("#tab-episodes .ep-watched-count");
+  if (cnt) cnt.textContent = c + " of " + total + " watched";
+  const ma = $("#ep-markall");
+  if (ma) ma.textContent = c >= total ? "Clear watched" : "✓ Mark all watched";
+  $$("#tab-episodes .ep-row").forEach(r => {
+    const on = isWatched(id, Number(r.dataset.n));
+    r.classList.toggle("watched", on);
+    const chk = r.querySelector(".ep-check");
+    if (chk) chk.classList.toggle("on", on);
+  });
+  renderRows();
+}
+
 const $ = (s, el) => (el || document).querySelector(s);
 const $$ = (s, el) => Array.from((el || document).querySelectorAll(s));
 const byId = id => DRAMAS.find(d => d.id === id);
@@ -246,8 +278,9 @@ function cardHTML(d, opts) {
   opts = opts || {};
   const inList = myList.includes(d.id);
   const rank = opts.rank ? `<span class="rank">${opts.rank}</span>` : "";
-  const prog = d.progress ? `<div class="prog"><i style="width:${d.progress}%"></i></div>` : "";
   const eps = epCount(d.id);
+  const w = watchedCount(d.id);
+  const prog = w ? `<div class="prog"><i style="width:${Math.round(w / eps * 100)}%"></i></div>` : "";
   return `<article class="card" data-id="${d.id}"${opts.resumeVid ? ` data-rvid="${opts.resumeVid}" data-rn="${opts.resumeN}"` : ""}${opts.resumePl ? ` data-rpl="1"` : ""} tabindex="0" role="button" aria-label="${esc(d.title)}">
     ${rank}
     <div class="poster"><img src="${d.poster}" alt="${esc(d.title)} poster" loading="lazy" onerror="this.closest('.poster').classList.add('noimg');this.remove();">
@@ -259,7 +292,7 @@ function cardHTML(d, opts) {
     <div class="card-body">
       <h3>${esc(d.title)}</h3>
       <p class="urdu">${esc(d.urdu)}</p>
-      <p class="meta"><span class="chan" style="--c:${chanColor(d.channel)}">${esc(d.channel)}</span> • ${d.year}${eps ? ` • <span class="epn">${eps} episode${eps === 1 ? "" : "s"}</span>` : ""}</p>
+      <p class="meta"><span class="chan" style="--c:${chanColor(d.channel)}">${esc(d.channel)}</span> • ${d.year}${eps ? ` • <span class="epn">${eps} episode${eps === 1 ? "" : "s"}</span>` : ""}${w ? ` • <span class="watched-n">${w}/${eps} watched</span>` : ""}</p>
       <div class="card-foot">${statusBadge(d)}${d.status === "On Air" ? `<span class="newep">● New Ep ${eps}</span>` : ""}${d.schedule && d.status === "On Air" ? `<span class="sched">${esc(d.schedule)}</span>` : ""}${opts.resume ? `<span class="resume">▶ ${esc(opts.resume)}</span>` : ""}</div>
     </div>
   </article>`;
@@ -430,25 +463,31 @@ function episodesHTML(d) {
     : "Completed — " + e.count + " episodes";
   const withV = e.eps.filter(ep => ep.v);
   const defEp = withV.length ? (e.status === "ongoing" ? withV[withV.length - 1] : withV[0]) : null;
+  const defIdx = defEp ? withV.indexOf(defEp) : -1;
+  const nextEp = defIdx >= 0 ? withV[defIdx + 1] || null : null;
   const playerHTML = defEp ? `
     <div class="ep-player" style="background-image:url(${d.poster});background-size:cover;background-position:center">
       <iframe id="ep-player-frame" src="https://www.youtube-nocookie.com/embed/${defEp.v}?rel=0" title="Episode player" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
     </div>
-    <p class="ep-now" id="ep-now">Now playing: Episode ${defEp.n}${defEp.d ? " · " + esc(defEp.d) : ""} <a class="ep-yt" href="https://www.youtube.com/watch?v=${defEp.v}" target="_blank" rel="noopener">Open on YouTube ↗</a></p>` : "";
+    <p class="ep-now" id="ep-now">Now playing: Episode ${defEp.n}${defEp.d ? " · " + esc(defEp.d) : ""} <a class="ep-yt" href="https://www.youtube.com/watch?v=${defEp.v}" target="_blank" rel="noopener">Open on YouTube ↗</a></p>
+    <button class="btn ghost ep-next" id="ep-next" data-vid="${nextEp ? nextEp.v : ""}" data-n="${nextEp ? nextEp.n : ""}" data-d="${nextEp && nextEp.d ? esc(nextEp.d) : ""}"${nextEp ? "" : ' style="display:none"'}>Next: Episode ${nextEp ? nextEp.n : ""} ▶</button>` : "";
   const rows = e.eps.map(ep => {
     const badge = e.status === "ongoing" && ep.n === e.count
       ? '<span class="ep-badge latest">Latest</span>'
       : (e.status === "completed" && ep.n === e.count ? '<span class="ep-badge">Finale</span>' : "");
     const title = ep.t ? " — " + esc(ep.t) : "";
     const date = ep.d ? `<span class="ep-date">${esc(ep.d)}</span>` : "";
+    const w = isWatched(d.id, ep.n);
     const inner = `<span class="ep-num">${ep.n}</span>
       <span class="ep-name">Episode ${ep.n}${title}</span>
       ${badge}${date}`;
     if (ep.v) {
-      return `<button class="ep-row${defEp && ep.n === defEp.n ? " active" : ""}" data-vid="${ep.v}" data-n="${ep.n}" data-d="${esc(ep.d || "")}">${inner}
+      return `<button class="ep-row${defEp && ep.n === defEp.n ? " active" : ""}${w ? " watched" : ""}" data-vid="${ep.v}" data-n="${ep.n}" data-d="${esc(ep.d || "")}">${inner}
+      <span class="ep-check${w ? " on" : ""}" role="button" tabindex="0" title="Mark as watched">✓</span>
       <span class="ep-play" aria-label="Play episode">▶</span></button>`;
     }
-    return `<a class="ep-row" href="${ytEpURL(d, ep.n)}" target="_blank" rel="noopener">${inner}
+    return `<a class="ep-row${w ? " watched" : ""}" data-n="${ep.n}" href="${ytEpURL(d, ep.n)}" target="_blank" rel="noopener">${inner}
+      <span class="ep-check${w ? " on" : ""}" role="button" tabindex="0" title="Mark as watched">✓</span>
       <span class="ep-play" aria-label="Watch episode">↗</span></a>`;
   }).join("");
   const playAll = e.p
@@ -459,12 +498,30 @@ function episodesHTML(d) {
       <p>${statusLine}</p>
       ${playAll}
     </div>
+    <div class="ep-tools">
+      <span class="ep-watched-count">${watchedCount(d.id)} of ${e.count} watched</span>
+      <button class="btn ghost ep-markall" id="ep-markall">${watchedCount(d.id) >= e.count ? "Clear watched" : "✓ Mark all watched"}</button>
+    </div>
     <div class="ep-filter-wrap"><input class="ep-filter" type="search" placeholder="Find an episode… try a number or a date" aria-label="Find an episode"><span class="ep-filter-count">${e.eps.length} episodes</span></div>
     <p class="ep-nomatch" hidden>No episodes match that search.</p>
     <div class="ep-list">${rows}</div>
     <p class="fine">Episodes play right here, from the channel's official YouTube uploads — this site does not host episodes. A row marked ↗ has no official video linked yet, so it opens a YouTube search instead. Air dates are shown only where verified. Episode list checked 7 Nov 2026.</p>`;
 }
 
+function updateNextBtn() {
+  const nb = $("#ep-next");
+  if (!nb || !modalOpen) return;
+  const e = (typeof EPISODES !== "undefined" && EPISODES[modalOpen]) || null;
+  if (!e) { nb.style.display = "none"; return; }
+  const f = $("#ep-player-frame");
+  const cur = f ? ((f.src.match(/embed\/([^?&#]+)/) || [])[1] || "") : "";
+  const idx = e.eps.findIndex(ep => ep.v === cur);
+  const nx = idx >= 0 ? e.eps.slice(idx + 1).find(ep => ep.v) : null;
+  if (!nx) { nb.style.display = "none"; return; }
+  nb.style.display = "";
+  nb.dataset.vid = nx.v; nb.dataset.n = nx.n; nb.dataset.d = nx.d || "";
+  nb.textContent = "Next: Episode " + nx.n + " ▶";
+}
 function loadEpisode(vid, n, d) {
   const f = $("#ep-player-frame");
   if (!f) return;
@@ -475,11 +532,14 @@ function loadEpisode(vid, n, d) {
     ' <a class="ep-yt" href="https://www.youtube.com/watch?v=' + vid + '" target="_blank" rel="noopener">Open on YouTube ↗</a>';
   $$("#modal-body .ep-row").forEach(r => r.classList.toggle("active", r.dataset.vid === vid));
   f.scrollIntoView({ behavior: "smooth", block: "nearest" });
+  updateNextBtn();
 }
 function loadPlaylist(pl) {
   const f = $("#ep-player-frame");
   if (!f) return;
   if (modalOpen && byId(modalOpen)) saveContinue(modalOpen, "all", null);
+  const nb = $("#ep-next");
+  if (nb) nb.style.display = "none";
   f.src = "https://www.youtube-nocookie.com/embed?listType=playlist&list=" + pl + "&autoplay=1&rel=0";
   const now = $("#ep-now");
   if (now) now.innerHTML = 'Now playing: full playlist — all episodes, in order.' +
@@ -627,6 +687,35 @@ function init() {
   $("#modal").addEventListener("click", e => { if (e.target.id === "modal") closeModal(); });
   // in-site episode player: rows with a video id load it into the player
   $("#modal-body").addEventListener("click", e => {
+    const chk = e.target.closest(".ep-check");
+    if (chk) {
+      e.preventDefault();
+      const row = chk.closest(".ep-row");
+      if (row && modalOpen) {
+        const n = Number(row.dataset.n);
+        setWatched(modalOpen, n, !isWatched(modalOpen, n));
+        refreshWatchedUI(modalOpen);
+      }
+      return;
+    }
+    const nx = e.target.closest("#ep-next");
+    if (nx && nx.dataset.vid) {
+      const f = $("#ep-player-frame");
+      const cur = f ? ((f.src.match(/embed\/([^?&#]+)/) || [])[1] || "") : "";
+      const eps = ((EPISODES[modalOpen] || {}).eps || []);
+      const curEp = eps.find(ep => ep.v === cur);
+      if (curEp && modalOpen) { setWatched(modalOpen, curEp.n, true); refreshWatchedUI(modalOpen); }
+      loadEpisode(nx.dataset.vid, nx.dataset.n, nx.dataset.d);
+      return;
+    }
+    const ma = e.target.closest("#ep-markall");
+    if (ma && modalOpen) {
+      const eps = ((EPISODES[modalOpen] || {}).eps || []);
+      const allDone = eps.length && eps.every(ep => isWatched(modalOpen, ep.n));
+      eps.forEach(ep => setWatched(modalOpen, ep.n, !allDone));
+      refreshWatchedUI(modalOpen);
+      return;
+    }
     const row = e.target.closest(".ep-row[data-vid]");
     if (row) { loadEpisode(row.dataset.vid, row.dataset.n, row.dataset.d); return; }
     const all = e.target.closest("#ep-playall");

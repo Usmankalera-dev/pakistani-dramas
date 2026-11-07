@@ -318,3 +318,16 @@ footer .made { margin-top: 8px; color: #c9c9d6; }
 .ep-filter:focus { border-color: var(--red); }
 .ep-filter-count { color: var(--muted); font-size: 12.5px; white-space: nowrap; }
 .ep-nomatch { color: var(--muted); font-size: 13.5px; padding: 16px 4px; }
+
+/* ---------- upgrade round 3: watched + next episode ---------- */
+.ep-check { width: 26px; height: 26px; border-radius: 50%; border: 1px solid var(--line);
+  background: var(--panel2); color: var(--muted); display: grid; place-items: center;
+  font-size: 13px; flex: none; cursor: pointer; }
+.ep-check:hover { border-color: var(--green); color: #4ade80; }
+.ep-check.on { background: var(--green); border-color: var(--green); color: #fff; }
+.ep-row.watched .ep-name { opacity: .55; }
+.watched-n { color: #4ade80; font-weight: 700; }
+.ep-tools { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; margin: 12px 0 0; }
+.ep-watched-count { font-size: 13px; color: var(--muted); font-weight: 600; }
+.ep-markall { padding: 8px 16px; font-size: 13px; }
+.ep-next { margin-top: 12px; }
