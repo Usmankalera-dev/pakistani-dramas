@@ -9,6 +9,12 @@ A Netflix-style catalogue of Pakistani dramas, in the same spirit as
   (Kabhi Main Kabhi Tum, Tere Bin, Sher, Meem Se Mohabbat, Jaan Nisar, Ishq Murshid).
 - **Cast, channel, year, status and TV timings** — grounded in Oct–Nov 2026
   trending reports (Neemopani, Filmibeat). No invented ratings or episode counts.
+- **Full episode lists — 702 episodes across all 20 dramas** (checked 7 Nov 2026).
+  Every drama's detail popup has an **Episodes** tab: every episode number,
+  air date where verified (TVmaze, Wikipedia, Moviefone, harpalgeo.tv, official
+  YouTube descriptions), a Latest/Finale badge, and a ▶ link per episode that
+  opens a YouTube search on the channel's official uploads. Ongoing shows list
+  the episodes aired so far.
 - **Search, channel filter, sort** (Popular / Newest / A–Z), **My List**
   (saved in the browser), drama detail popups, hero switcher, notification panel
   with the week's TV timings.

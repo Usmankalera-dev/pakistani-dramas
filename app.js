@@ -16,18 +16,18 @@ const DRAMAS = [
     poster: "posters/dar-e-nijaat.webp", rank: 1, progress: 0 },
   { id: "kafeel", title: "Kafeel", urdu: "کفیل", channel: "ARY Digital", year: 2026,
     cast: ["Sanam Saeed", "Emmad Irfani", "Munnaza Arif"], genre: "Social Drama",
-    status: "On Air", schedule: "", views: "",
-    synopsis: "A social drama about a powerful man and the people who depend on him — one of the top-rated shows of the year.",
+    status: "Completed", schedule: "Mon & Tue, 8:00 PM", views: "",
+    synopsis: "A social drama by Umera Ahmed about a powerful man and the people who depend on him — one of the top-rated shows of the year. Ended 28 April 2026.",
     poster: "posters/kafeel.jpg", rank: 2, progress: 0 },
   { id: "shar-pasand", title: "Shar Pasand", urdu: "شر پسند", channel: "ARY Digital", year: 2026,
     cast: ["Nauman Ijaz", "Hareem Farooq", "Hira Mani", "Affan Waheed"], genre: "Social Drama",
-    status: "On Air", schedule: "", views: "",
-    synopsis: "A woman pushes back against social expectations and class divides, carried by Nauman Ijaz's much-praised performance.",
+    status: "Completed", schedule: "Wed & Thu, 8:00 PM", views: "",
+    synopsis: "A woman pushes back against social expectations and class divides, carried by Nauman Ijaz's much-praised performance. Ended 2 April 2026 after 52 episodes.",
     poster: "posters/shar-pasand.jpg", rank: 3, progress: 0 },
   { id: "bas-tera-saath-ho", title: "Bas Tera Saath Ho", urdu: "بس تیرا ساتھ ہو", channel: "ARY Digital", year: 2026,
     cast: ["Farhan Saeed", "Sana Javed", "Zoya Nasir", "Saba Hamid"], genre: "Romance • Family",
-    status: "On Air", schedule: "Mon & Tue, 8:00 PM", views: "11.3 TRP",
-    synopsis: "A romantic family drama that premiered in May and became one of the year's highest-rated shows.",
+    status: "Completed", schedule: "Mon & Tue, 8:00 PM", views: "11.3 TRP",
+    synopsis: "A romantic family drama that premiered in May and became one of the year's highest-rated shows. Ended 5 October 2026.",
     poster: "posters/bas-tera-saath-ho.webp", rank: 4, progress: 0 },
   { id: "nashtar", title: "Nashtar", urdu: "نشتر", channel: "Geo Entertainment", year: 2026,
     cast: ["Danish Taimoor", "Anmol Baloch"], genre: "Romance • Drama",
@@ -36,8 +36,8 @@ const DRAMAS = [
     poster: "posters/nashtar.webp", rank: 5, progress: 0 },
   { id: "zanjeerain", title: "Zanjeerain", urdu: "زنجیریں", channel: "HUM TV", year: 2026,
     cast: ["Sajal Aly", "Ameer Gilani", "Ahsan Khan", "Danyal Zafar"], genre: "Romance • Drama",
-    status: "On Air", schedule: "Wed & Thu, 8:00 PM", views: "7.7 TRP",
-    synopsis: "A star-studded HUM TV drama that has stayed in the conversation since April.",
+    status: "Completed", schedule: "Wed & Thu, 8:00 PM", views: "7.7 TRP",
+    synopsis: "A star-studded HUM TV drama that stayed in the conversation from April to September 2026.",
     poster: "posters/zanjeerain.webp", rank: 6, progress: 0 },
   { id: "mitti-de-baway", title: "Mitti De Baway", urdu: "مٹی دے باوے", channel: "Green Entertainment", year: 2026,
     cast: ["Mahira Khan", "Wahaj Ali"], genre: "Period Romance",
@@ -46,8 +46,8 @@ const DRAMAS = [
     poster: "posters/mitti-de-baway.jpg", rank: 7, progress: 0 },
   { id: "humrahi", title: "Humrahi", urdu: "ہمراہی", channel: "Geo Entertainment", year: 2026,
     cast: ["Danish Taimoor", "Hiba Bukhari"], genre: "Romance • Drama",
-    status: "On Air", schedule: "Fri & Sat, 8:00 PM", views: "8.1 TRP",
-    synopsis: "A Geo favourite since March, led by one of TV's most popular on-screen pairs.",
+    status: "Completed", schedule: "Fri & Sat, 8:00 PM", views: "8.1 TRP",
+    synopsis: "A Geo favourite from March to August 2026, led by one of TV's most popular on-screen pairs.",
     poster: "posters/humrahi.jpg", rank: 8, progress: 0 },
   { id: "meri-zindagi-hai-tu", title: "Meri Zindagi Hai Tu", urdu: "میری زندگی ہے تو", channel: "HUM TV", year: 2026,
     cast: ["Hania Aamir", "Bilal Abbas Khan"], genre: "Romance • Drama",
@@ -56,8 +56,8 @@ const DRAMAS = [
     poster: "posters/meri-zindagi-hai-tu.jpg", rank: 9, progress: 62 },
   { id: "sanwal-yaar-piya", title: "Sanwal Yaar Piya", urdu: "سنول یار پیا", channel: "Geo Entertainment", year: 2026,
     cast: [], genre: "Romance • Drama",
-    status: "On Air", schedule: "", views: "First 2026 drama to cross 1B views",
-    synopsis: "The first Pakistani drama of 2026 to cross one billion views — in just 33 episodes.",
+    status: "Completed", schedule: "", views: "First 2026 drama to cross 1B views",
+    synopsis: "The first Pakistani drama of 2026 to cross one billion views — 40 episodes in all, ending January 2026.",
     poster: "posters/sanwal-yaar-piya.jpg", rank: 10, progress: 0 },
   { id: "kabhi-main-kabhi-tum", title: "Kabhi Main Kabhi Tum", urdu: "کبھی میں کبھی تم", channel: "ARY Digital", year: 2024,
     cast: ["Fahad Mustafa", "Hania Aamir"], genre: "Romance • Drama",
@@ -101,13 +101,13 @@ const DRAMAS = [
     poster: "posters/mohabbat.jpg", rank: 18, progress: 0 },
   { id: "muamma", title: "Muamma", urdu: "معمہ", channel: "HUM TV", year: 2026,
     cast: ["Saba Qamar", "Usman Mukhtar", "Ali Ansari"], genre: "Mystery Thriller",
-    status: "On Air", schedule: "", views: "",
-    synopsis: "A slow-burn mystery thriller built around one central puzzle, with strong viewership.",
+    status: "Completed", schedule: "", views: "",
+    synopsis: "A slow-burn mystery thriller built around one central puzzle, with strong viewership. Ended 23 April 2026 after 35 episodes.",
     poster: "posters/muamma.jpg", rank: 19, progress: 0 },
-  { id: "case-no-9", title: "Case No. 9", urdu: "کیس نمبر 9", channel: "ARY Digital", year: 2026,
-    cast: ["Saba Qamar", "Usman Mukhtar"], genre: "Drama",
-    status: "On Air", schedule: "", views: "",
-    synopsis: "A 2026 ARY drama starring Saba Qamar and Usman Mukhtar.",
+  { id: "case-no-9", title: "Case No. 9", urdu: "کیس نمبر 9", channel: "Geo Entertainment", year: 2025,
+    cast: ["Saba Qamar", "Faysal Quraishi", "Junaid Khan", "Aamina Sheikh"], genre: "Courtroom Drama",
+    status: "Completed", schedule: "Wed & Thu, 8:00 PM", views: "",
+    synopsis: "Sehar Moazzam fights a powerful man in court after a sexual assault — Geo's boldest courtroom drama, written by Shahzeb Khanzada. 32 episodes, ending 8 January 2026.",
     poster: "posters/case-no-9.jpg", rank: 20, progress: 0 },
 ];
 
@@ -131,11 +131,14 @@ function statusBadge(d) {
     : '<span class="pill done">Completed</span>';
 }
 
+function epCount(id) { const e = (typeof EPISODES !== "undefined" && EPISODES[id]) || null; return e ? e.count : 0; }
+
 function cardHTML(d, opts) {
   opts = opts || {};
   const inList = myList.includes(d.id);
   const rank = opts.rank ? `<span class="rank">${opts.rank}</span>` : "";
   const prog = d.progress ? `<div class="prog"><i style="width:${d.progress}%"></i></div>` : "";
+  const eps = epCount(d.id);
   return `<article class="card" data-id="${d.id}" tabindex="0" role="button" aria-label="${esc(d.title)}">
     ${rank}
     <div class="poster"><img src="${d.poster}" alt="${esc(d.title)} poster" loading="lazy" onerror="this.closest('.poster').classList.add('noimg');this.remove();">
@@ -147,7 +150,7 @@ function cardHTML(d, opts) {
     <div class="card-body">
       <h3>${esc(d.title)}</h3>
       <p class="urdu">${esc(d.urdu)}</p>
-      <p class="meta"><span class="chan" style="--c:${chanColor(d.channel)}">${esc(d.channel)}</span> • ${d.year}</p>
+      <p class="meta"><span class="chan" style="--c:${chanColor(d.channel)}">${esc(d.channel)}</span> • ${d.year}${eps ? ` • <span class="epn">${eps} episode${eps === 1 ? "" : "s"}</span>` : ""}</p>
       <div class="card-foot">${statusBadge(d)}${d.schedule ? `<span class="sched">${esc(d.schedule)}</span>` : ""}</div>
     </div>
   </article>`;
@@ -248,6 +251,43 @@ function heroStep(dir) {
   setHero(HERO_IDS[heroIdx]);
 }
 
+/* ---------- episodes ---------- */
+const YT_SEARCH_NAME = { "ARY Digital": "ARY Digital", "HUM TV": "HUM TV",
+  "Geo Entertainment": "Har Pal Geo", "Green Entertainment": "Green TV Entertainment" };
+function ytEpURL(d, n) {
+  return "https://www.youtube.com/results?search_query=" +
+    encodeURIComponent(d.title + " Episode " + n + " " + (YT_SEARCH_NAME[d.channel] || d.channel));
+}
+function ytAllURL(d) {
+  return "https://www.youtube.com/results?search_query=" +
+    encodeURIComponent(d.title + " full episodes " + (YT_SEARCH_NAME[d.channel] || d.channel));
+}
+function episodesHTML(d) {
+  const e = (typeof EPISODES !== "undefined" && EPISODES[d.id]) || null;
+  if (!e) return '<p class="fine">Episode list coming soon.</p>';
+  const statusLine = e.status === "ongoing"
+    ? "Ongoing — " + e.count + " episodes aired so far" + (e.latest ? " · latest: " + esc(e.latest) : "") + " (checked 7 Nov 2026)"
+    : "Completed — " + e.count + " episodes";
+  const rows = e.eps.map(ep => {
+    const badge = e.status === "ongoing" && ep.n === e.count
+      ? '<span class="ep-badge latest">Latest</span>'
+      : (e.status === "completed" && ep.n === e.count ? '<span class="ep-badge">Finale</span>' : "");
+    const title = ep.t ? " — " + esc(ep.t) : "";
+    return `<a class="ep-row" href="${ytEpURL(d, ep.n)}" target="_blank" rel="noopener">
+      <span class="ep-num">${ep.n}</span>
+      <span class="ep-name">Episode ${ep.n}${title}</span>
+      ${badge}
+      ${ep.d ? `<span class="ep-date">${esc(ep.d)}</span>` : ""}
+      <span class="ep-play" aria-label="Watch episode">▶</span></a>`;
+  }).join("");
+  return `<div class="ep-head">
+      <p><b>${e.count} episodes</b> · ${statusLine}</p>
+      <a class="btn watch ep-all" href="${ytAllURL(d)}" target="_blank" rel="noopener">▶ Watch all on YouTube</a>
+    </div>
+    <div class="ep-list">${rows}</div>
+    <p class="fine">Each episode opens as a YouTube search on the channel's official uploads — this site does not host episodes. Air dates are shown only where verified.</p>`;
+}
+
 /* ---------- modal ---------- */
 let modalOpen = null;
 function openModal(id, keep) {
@@ -263,20 +303,32 @@ function openModal(id, keep) {
       <h2>${esc(d.title)}</h2>
       <p class="urdu big">${esc(d.urdu)}</p>
       <div class="modal-meta">${statusBadge(d)}<span class="chan" style="--c:${chanColor(d.channel)}">${esc(d.channel)}</span><span>${d.year}</span><span>${esc(d.genre)}</span></div>
-      ${d.schedule ? `<p class="line"><b>Airs:</b> ${esc(d.schedule)} (Pakistan time)</p>` : ""}
-      ${d.cast.length ? `<p class="line"><b>Cast:</b> ${d.cast.map(esc).join(", ")}</p>` : ""}
-      ${d.views ? `<p class="line"><b>Buzz:</b> ${esc(d.views)}</p>` : ""}
-      <p class="syn">${esc(d.synopsis)}</p>
-      <div class="modal-actions">
-        <a class="btn watch" href="${ch.yt}" target="_blank" rel="noopener">▶ Watch on YouTube — ${esc(d.channel)}</a>
-        <button class="btn ghost" id="modal-list">${myList.includes(d.id) ? "✓ In My List" : "+ My List"}</button>
+      <div class="tabs" role="tablist">
+        <button class="tab active" data-tab="details">Details</button>
+        <button class="tab" data-tab="episodes">Episodes <span class="ep-count">${epCount(d.id)}</span></button>
       </div>
-      <p class="fine">Episodes air on TV first, then on the channel's official YouTube. This site lists dramas — it does not host episodes.</p>
-      ${same.length ? `<h4>More on ${esc(d.channel)}</h4><div class="modal-more">${same.map(x => `<button class="mini" data-id="${x.id}"><img src="${x.poster}" alt="" loading="lazy" onerror="this.remove();"><span>${esc(x.title)}</span></button>`).join("")}</div>` : ""}
+      <div class="tab-pane" id="tab-details">
+        ${d.schedule ? `<p class="line"><b>Airs:</b> ${esc(d.schedule)} (Pakistan time)</p>` : ""}
+        ${d.cast.length ? `<p class="line"><b>Cast:</b> ${d.cast.map(esc).join(", ")}</p>` : ""}
+        ${d.views ? `<p class="line"><b>Buzz:</b> ${esc(d.views)}</p>` : ""}
+        <p class="syn">${esc(d.synopsis)}</p>
+        <div class="modal-actions">
+          <a class="btn watch" href="${ch.yt}" target="_blank" rel="noopener">▶ Watch on YouTube — ${esc(d.channel)}</a>
+          <button class="btn ghost" id="modal-list">${myList.includes(d.id) ? "✓ In My List" : "+ My List"}</button>
+        </div>
+        <p class="fine">Episodes air on TV first, then on the channel's official YouTube. This site lists dramas — it does not host episodes.</p>
+        ${same.length ? `<h4>More on ${esc(d.channel)}</h4><div class="modal-more">${same.map(x => `<button class="mini" data-id="${x.id}"><img src="${x.poster}" alt="" loading="lazy" onerror="this.remove();"><span>${esc(x.title)}</span></button>`).join("")}</div>` : ""}
+      </div>
+      <div class="tab-pane" id="tab-episodes" hidden>${episodesHTML(d)}</div>
     </div>`;
   $("#modal").classList.add("open");
   document.body.style.overflow = "hidden";
   $("#modal-list").onclick = () => toggleList(d.id);
+  $$("#modal-body .tab").forEach(t => t.addEventListener("click", () => {
+    $$("#modal-body .tab").forEach(x => x.classList.toggle("active", x === t));
+    $("#tab-details").hidden = t.dataset.tab !== "details";
+    $("#tab-episodes").hidden = t.dataset.tab !== "episodes";
+  }));
   $$("#modal-body .mini").forEach(b => b.addEventListener("click", () => openModal(b.dataset.id)));
   if (!keep) $("#modal").scrollTop = 0;
 }
