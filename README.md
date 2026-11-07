@@ -15,13 +15,20 @@ A Netflix-style catalogue of Pakistani dramas, in the same spirit as
   YouTube descriptions), a Latest/Finale badge. **Episodes play inside the site:**
   703 of 704 episodes have a verified official YouTube video id and open in an
   in-site player (all 20 dramas covered — the only row still opening YouTube is
-  Mohabbat Episode 13, whose official video could not be verified yet),
+  Mohabbat Episode 13, whose official video (5lFlC_8gtZE) is private on YouTube,
+  confirmed 7 Nov 2026, so it stays a search link until the channel publishes
+  a public upload),
   with a "Play all episodes" button that plays the channel's official playlist.
   Rows without a verified video (marked ↗) open a YouTube search on the
   channel's official uploads instead. Ongoing shows list the episodes aired so far.
-- **Search, channel filter, sort** (Popular / Newest / A–Z), **My List**
-  (saved in the browser), drama detail popups, hero switcher, notification panel
-  with the week's TV timings.
+- **Search, channel filter, sort** (Popular / Newest / A–Z / Recently updated),
+  **My List** (saved in the browser), drama detail popups, hero switcher,
+  notification panel with the week's TV timings.
+- **Continue Watching is real now** — the episodes you actually play are saved
+  in the browser with a Resume chip (empty state falls back to curated picks).
+  **Episode filter** inside the Episodes tab (find by number or date).
+  **Share** any drama (copy link / WhatsApp) — shared links open that drama
+  directly (`#drama-id`). On-Air cards show a **New Ep** chip.
 - **Real posters** (downloaded from official channel art and poster sources),
   stored locally in `posters/`.
 - **Watch links go to the channels' official YouTube accounts**

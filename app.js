@@ -53,7 +53,7 @@ const DRAMAS = [
     cast: ["Hania Aamir", "Bilal Abbas Khan"], genre: "Romance • Drama",
     status: "Completed", schedule: "", views: "1.3B+ views — most-watched drama of 2026",
     synopsis: "The most-watched Pakistani drama of 2026. Hania Aamir and Bilal Abbas Khan in a love story that entered the all-time top 10 before ending in March.",
-    poster: "posters/meri-zindagi-hai-tu.jpg", rank: 9, progress: 62 },
+    poster: "posters/meri-zindagi-hai-tu.jpg", rank: 9, progress: 0 },
   { id: "sanwal-yaar-piya", title: "Sanwal Yaar Piya", urdu: "سنول یار پیا", channel: "Geo Entertainment", year: 2026,
     cast: [], genre: "Romance • Drama",
     status: "Completed", schedule: "", views: "First 2026 drama to cross 1B views",
@@ -63,17 +63,17 @@ const DRAMAS = [
     cast: ["Fahad Mustafa", "Hania Aamir"], genre: "Romance • Drama",
     status: "Completed", schedule: "", views: "1.24B+ views",
     synopsis: "Fahad Mustafa and Hania Aamir in the ARY blockbuster that passed 1.24 billion views and still trends in 2026.",
-    poster: "posters/kabhi-main-kabhi-tum.jpg", rank: 11, progress: 45 },
+    poster: "posters/kabhi-main-kabhi-tum.jpg", rank: 11, progress: 0 },
   { id: "tere-bin", title: "Tere Bin", urdu: "تیرے بن", channel: "Geo Entertainment", year: 2022,
     cast: ["Wahaj Ali", "Yumna Zaidi"], genre: "Romance • Drama",
     status: "Completed", schedule: "", views: "4B+ views — most-watched Pakistani drama ever",
     synopsis: "Wahaj Ali and Yumna Zaidi in the most-watched Pakistani drama of all time — over 4 billion views and counting.",
-    poster: "posters/tere-bin.jpg", rank: 12, progress: 78 },
+    poster: "posters/tere-bin.jpg", rank: 12, progress: 0 },
   { id: "sher", title: "Sher", urdu: "شیر", channel: "ARY Digital", year: 2025,
     cast: ["Danish Taimoor", "Sarah Khan"], genre: "Romance • Drama",
     status: "Completed", schedule: "Wed & Thu, 8:00 PM", views: "One of 2025's most-watched dramas",
     synopsis: "Danish Taimoor and Sarah Khan in ARY's 2025 hit — a powerful love story with one of the year's biggest audiences.",
-    poster: "posters/sher.jpg", rank: 13, progress: 23 },
+    poster: "posters/sher.jpg", rank: 13, progress: 0 },
   { id: "meem-se-mohabbat", title: "Meem Se Mohabbat", urdu: "میم سے محبت", channel: "HUM TV", year: 2024,
     cast: ["Ahad Raza Mir", "Dananeer Mobeen"], genre: "Romance • Drama",
     status: "Completed", schedule: "", views: "",
@@ -218,6 +218,18 @@ let myList = [];
 try { myList = JSON.parse(localStorage.getItem("pakdrama-mylist") || "[]"); } catch (e) { myList = []; }
 function saveList() { try { localStorage.setItem("pakdrama-mylist", JSON.stringify(myList)); } catch (e) {} }
 
+/* ---------- continue watching (real: what you actually played) ---------- */
+let continueList = [];
+try { continueList = JSON.parse(localStorage.getItem("pakdrama-continue") || "[]"); } catch (e) { continueList = []; }
+function saveContinueList() { try { localStorage.setItem("pakdrama-continue", JSON.stringify(continueList)); } catch (e) {} }
+function saveContinue(id, n, vid) {
+  continueList = continueList.filter(x => x.id !== id);
+  continueList.unshift({ id, n, vid: vid || null, at: Date.now() });
+  continueList = continueList.slice(0, 8);
+  saveContinueList();
+  renderRows();
+}
+
 const $ = (s, el) => (el || document).querySelector(s);
 const $$ = (s, el) => Array.from((el || document).querySelectorAll(s));
 const byId = id => DRAMAS.find(d => d.id === id);
@@ -236,7 +248,7 @@ function cardHTML(d, opts) {
   const rank = opts.rank ? `<span class="rank">${opts.rank}</span>` : "";
   const prog = d.progress ? `<div class="prog"><i style="width:${d.progress}%"></i></div>` : "";
   const eps = epCount(d.id);
-  return `<article class="card" data-id="${d.id}" tabindex="0" role="button" aria-label="${esc(d.title)}">
+  return `<article class="card" data-id="${d.id}"${opts.resumeVid ? ` data-rvid="${opts.resumeVid}" data-rn="${opts.resumeN}"` : ""}${opts.resumePl ? ` data-rpl="1"` : ""} tabindex="0" role="button" aria-label="${esc(d.title)}">
     ${rank}
     <div class="poster"><img src="${d.poster}" alt="${esc(d.title)} poster" loading="lazy" onerror="this.closest('.poster').classList.add('noimg');this.remove();">
       <span class="poster-title">${esc(d.title)}<small>${esc(d.urdu)}</small></span>
@@ -248,11 +260,21 @@ function cardHTML(d, opts) {
       <h3>${esc(d.title)}</h3>
       <p class="urdu">${esc(d.urdu)}</p>
       <p class="meta"><span class="chan" style="--c:${chanColor(d.channel)}">${esc(d.channel)}</span> • ${d.year}${eps ? ` • <span class="epn">${eps} episode${eps === 1 ? "" : "s"}</span>` : ""}</p>
-      <div class="card-foot">${statusBadge(d)}${d.schedule && d.status === "On Air" ? `<span class="sched">${esc(d.schedule)}</span>` : ""}</div>
+      <div class="card-foot">${statusBadge(d)}${d.status === "On Air" ? `<span class="newep">● New Ep ${eps}</span>` : ""}${d.schedule && d.status === "On Air" ? `<span class="sched">${esc(d.schedule)}</span>` : ""}${opts.resume ? `<span class="resume">▶ ${esc(opts.resume)}</span>` : ""}</div>
     </div>
   </article>`;
 }
 
+const MONTHS = { Jan: 0, Feb: 1, Mar: 2, Apr: 3, May: 4, Jun: 5, Jul: 6, Aug: 7, Sep: 8, Oct: 9, Nov: 10, Dec: 11 };
+function latestDate(d) {
+  const e = (typeof EPISODES !== "undefined" && EPISODES[d.id]) || null;
+  if (!e || !e.eps.length) return 0;
+  const last = e.eps[e.eps.length - 1];
+  if (!last.d) return 0;
+  const m = last.d.match(/(\d+)\s+(\w+)\s+(\d{4})/);
+  if (!m) return 0;
+  return new Date(+m[3], MONTHS[m[2]] || 0, +m[1]).getTime();
+}
 function filtered() {
   let list = DRAMAS.slice();
   if (state.view === "trending") list = list.filter(d => d.rank <= 10);
@@ -266,6 +288,7 @@ function filtered() {
   if (state.sort === "popular") list.sort((a, b) => a.rank - b.rank);
   if (state.sort === "newest") list.sort((a, b) => b.year - a.year || a.rank - b.rank);
   if (state.sort === "az") list.sort((a, b) => a.title.localeCompare(b.title));
+  if (state.sort === "recent") list.sort((a, b) => latestDate(b) - latestDate(a) || a.rank - b.rank);
   return list;
 }
 
@@ -297,8 +320,14 @@ function renderGrid() {
 }
 
 function renderRows() {
-  const cw = CW_IDS.map(byId).filter(Boolean);
-  $("#cw-row").innerHTML = cw.map(d => cardHTML(d)).join("");
+  const cwReal = continueList.map(x => byId(x.id)).filter(Boolean);
+  const cw = cwReal.length ? cwReal : CW_IDS.map(byId).filter(Boolean);
+  $("#cw-row").innerHTML = cw.map(d => {
+    const hit = continueList.find(x => x.id === d.id);
+    if (!hit) return cardHTML(d);
+    if (hit.n === "all") return cardHTML(d, { resume: "Playlist", resumePl: true });
+    return cardHTML(d, { resume: "Resume Ep " + hit.n, resumeVid: hit.vid, resumeN: hit.n });
+  }).join("");
   $$("#cw-row .card").forEach(bindCard);
   const tr = DRAMAS.filter(d => d.rank <= 10).sort((a, b) => a.rank - b.rank);
   $("#tr-row").innerHTML = tr.map((d, i) => cardHTML(d, { rank: i + 1 })).join("");
@@ -320,6 +349,17 @@ function bindCard(card) {
   card.addEventListener("click", e => {
     if (e.target.closest("[data-list]")) return;
     openModal(card.dataset.id);
+    if (card.dataset.rvid) {
+      const tab = $("#modal-body .tab[data-tab='episodes']");
+      if (tab) tab.click();
+      const ep = ((EPISODES[card.dataset.id] || {}).eps || []).find(x => String(x.n) === card.dataset.rn);
+      loadEpisode(card.dataset.rvid, card.dataset.rn, ep ? ep.d : "");
+    } else if (card.dataset.rpl) {
+      const tab = $("#modal-body .tab[data-tab='episodes']");
+      if (tab) tab.click();
+      const pl = (EPISODES[card.dataset.id] || {}).p;
+      if (pl) loadPlaylist(pl);
+    }
   });
   card.addEventListener("keydown", e => { if (e.key === "Enter") openModal(card.dataset.id); });
   const btn = card.querySelector("[data-list]");
@@ -419,6 +459,8 @@ function episodesHTML(d) {
       <p>${statusLine}</p>
       ${playAll}
     </div>
+    <div class="ep-filter-wrap"><input class="ep-filter" type="search" placeholder="Find an episode… try a number or a date" aria-label="Find an episode"><span class="ep-filter-count">${e.eps.length} episodes</span></div>
+    <p class="ep-nomatch" hidden>No episodes match that search.</p>
     <div class="ep-list">${rows}</div>
     <p class="fine">Episodes play right here, from the channel's official YouTube uploads — this site does not host episodes. A row marked ↗ has no official video linked yet, so it opens a YouTube search instead. Air dates are shown only where verified. Episode list checked 7 Nov 2026.</p>`;
 }
@@ -426,6 +468,7 @@ function episodesHTML(d) {
 function loadEpisode(vid, n, d) {
   const f = $("#ep-player-frame");
   if (!f) return;
+  if (modalOpen && byId(modalOpen)) saveContinue(modalOpen, n, vid);
   f.src = "https://www.youtube-nocookie.com/embed/" + vid + "?autoplay=1&rel=0";
   const now = $("#ep-now");
   if (now) now.innerHTML = "Now playing: Episode " + n + (d ? " · " + esc(d) : "") +
@@ -436,12 +479,34 @@ function loadEpisode(vid, n, d) {
 function loadPlaylist(pl) {
   const f = $("#ep-player-frame");
   if (!f) return;
+  if (modalOpen && byId(modalOpen)) saveContinue(modalOpen, "all", null);
   f.src = "https://www.youtube-nocookie.com/embed?listType=playlist&list=" + pl + "&autoplay=1&rel=0";
   const now = $("#ep-now");
   if (now) now.innerHTML = 'Now playing: full playlist — all episodes, in order.' +
     ' <a class="ep-yt" href="https://www.youtube.com/playlist?list=' + pl + '" target="_blank" rel="noopener">Open playlist on YouTube ↗</a>';
   $$("#modal-body .ep-row").forEach(r => r.classList.remove("active"));
   f.scrollIntoView({ behavior: "smooth", block: "nearest" });
+}
+
+/* ---------- share + deep links ---------- */
+function shareURL(d) {
+  const base = location.protocol.indexOf("http") === 0
+    ? location.origin + location.pathname
+    : "https://usmankalera-dev.github.io/pakistani-dramas/";
+  return base + "#" + d.id;
+}
+function fallbackCopy(t, done) {
+  const ta = document.createElement("textarea");
+  ta.value = t; ta.style.position = "fixed"; ta.style.opacity = "0";
+  document.body.appendChild(ta); ta.select();
+  try { document.execCommand("copy"); done(); } catch (e) { toast("Copy failed — long-press the link"); }
+  document.body.removeChild(ta);
+}
+function copyText(t) {
+  const done = () => toast("Link copied ✓");
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(t).then(done, () => fallbackCopy(t, done));
+  } else fallbackCopy(t, done);
 }
 
 /* ---------- modal ---------- */
@@ -471,6 +536,8 @@ function openModal(id, keep) {
         <div class="modal-actions">
           <a class="btn watch" href="${ch.yt}" target="_blank" rel="noopener">▶ Watch on YouTube — ${esc(d.channel)}</a>
           <button class="btn ghost" id="modal-list">${myList.includes(d.id) ? "✓ In My List" : "+ My List"}</button>
+          <button class="btn ghost" id="modal-share">↗ Share</button>
+          <a class="btn ghost" id="modal-wa" href="https://wa.me/?text=${encodeURIComponent("Watch " + d.title + " on PakDrama — " + shareURL(d))}" target="_blank" rel="noopener">WhatsApp</a>
         </div>
         <p class="fine">Episodes air on TV first, then on the channel's official YouTube. This site lists dramas — it does not host episodes.</p>
         ${same.length ? `<h4><img class="chan-logo" src="${ch.logo}" alt=""> More on ${esc(d.channel)}</h4><div class="modal-more">${same.map(x => `<button class="mini" data-id="${x.id}"><img src="${x.poster}" alt="" loading="lazy" onerror="this.remove();"><span>${esc(x.title)}</span></button>`).join("")}</div>` : ""}
@@ -480,6 +547,9 @@ function openModal(id, keep) {
   $("#modal").classList.add("open");
   document.body.style.overflow = "hidden";
   $("#modal-list").onclick = () => toggleList(d.id);
+  const sh = $("#modal-share");
+  if (sh) sh.onclick = () => copyText(shareURL(d));
+  try { history.replaceState(null, "", "#" + id); } catch (e) {}
   $$("#modal-body .tab").forEach(t => t.addEventListener("click", () => {
     $$("#modal-body .tab").forEach(x => x.classList.toggle("active", x === t));
     $("#tab-details").hidden = t.dataset.tab !== "details";
@@ -494,6 +564,7 @@ function openModal(id, keep) {
 }
 function closeModal() {
   modalOpen = null;
+  try { history.replaceState(null, "", location.pathname + location.search); } catch (e) {}
   $("#modal").classList.remove("open");
   document.body.style.overflow = "";
 }
@@ -561,10 +632,28 @@ function init() {
     const all = e.target.closest("#ep-playall");
     if (all) loadPlaylist(all.dataset.pl);
   });
+  // episode filter inside the modal
+  $("#modal-body").addEventListener("input", e => {
+    if (!e.target.classList.contains("ep-filter")) return;
+    const q = e.target.value.trim().toLowerCase();
+    const rows = $$("#tab-episodes .ep-row");
+    let shown = 0;
+    rows.forEach(r => {
+      const hit = !q || r.textContent.toLowerCase().includes(q);
+      r.style.display = hit ? "" : "none";
+      if (hit) shown++;
+    });
+    const nm = $("#tab-episodes .ep-nomatch");
+    if (nm) nm.hidden = shown !== 0;
+    const cnt = $("#tab-episodes .ep-filter-count");
+    if (cnt) cnt.textContent = q ? shown + " of " + rows.length + " episodes" : rows.length + " episodes";
+  });
   document.addEventListener("keydown", e => { if (e.key === "Escape") closeModal(); });
   $("#menu-btn").addEventListener("click", () => $("#sidebar").classList.add("open"));
   $("#drawer-close").addEventListener("click", closeDrawer);
   $("#scrim").addEventListener("click", closeDrawer);
+  const h = (location.hash || "").slice(1);
+  if (h && byId(h)) openModal(h);
 }
 function syncChips() { $$(".chip").forEach(c => c.classList.toggle("active", c.dataset.channel === state.channel)); }
 function closeDrawer() { $("#sidebar").classList.remove("open"); }
