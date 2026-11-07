@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PakDrama — Pakistani Dramas, All in One Place</title>
+<meta name="description" content="PakDrama lists the trending Pakistani dramas of 2026 — Dar-e-Nijaat, Kafeel, Meri Zindagi Hai Tu, Kabhi Main Kabhi Tum, Tere Bin and more — with cast, channel, timings and official YouTube links.">
+<meta property="og:title" content="PakDrama — Pakistani Dramas">
+<meta property="og:description" content="Trending Pakistani dramas of 2026 in one place. Cast, channel, timings and official watch links.">
+<meta property="og:type" content="website">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='22' fill='%23e50914'/><path d='M38 28 L74 50 L38 72 Z' fill='white'/></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800;900&family=Inter:wght@400;500;600;700&family=Noto+Nastaliq+Urdu:wght@500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<div id="scrim"></div>
+
+<aside id="sidebar">
+  <button id="drawer-close" aria-label="Close menu">✕</button>
+  <a class="logo" href="#" onclick="return false"><span class="logo-mark">▶</span><span class="logo-text">Pak<b>Drama</b></span></a>
+
+  <p class="side-label">News Feed</p>
+  <nav>
+    <button class="nav-item active" data-view="browse"><span class="ico">🧭</span>Browse</button>
+    <button class="nav-item" data-view="trending"><span class="ico">📈</span>Trending</button>
+    <button class="nav-item" data-view="onair"><span class="ico">📺</span>On Air Now</button>
+    <button class="nav-item" data-view="mylist"><span class="ico">🔖</span>My List <span class="count" id="mylist-count" style="display:none">0</span></button>
+  </nav>
+
+  <p class="side-label">Following</p>
+  <div class="channels">
+    <button class="chan-row" data-channel="ARY Digital"><span class="avatar" style="--c:#e50914">A</span>ARY Digital<i class="live-dot"></i></button>
+    <button class="chan-row" data-channel="HUM TV"><span class="avatar" style="--c:#7b2ff7">H</span>HUM TV<i class="live-dot"></i></button>
+    <button class="chan-row" data-channel="Geo Entertainment"><span class="avatar" style="--c:#00a651">G</span>Geo Entertainment<i class="live-dot"></i></button>
+    <button class="chan-row" data-channel="Green Entertainment"><span class="avatar" style="--c:#00b3a6">G</span>Green Entertainment<i class="live-dot"></i></button>
+  </div>
+
+  <div class="side-foot">
+    <p>All dramas air on TV first, then on the channels' official YouTube.</p>
+    <p class="made">A fan guide by <b>Usman Kalera</b></p>
+  </div>
+</aside>
+
+<main>
+  <header class="topbar">
+    <button id="menu-btn" aria-label="Open menu">☰</button>
+    <button class="back-btn" onclick="history.back()" aria-label="Go back">‹</button>
+    <div class="search-box">
+      <span class="search-ico">🔍</span>
+      <input id="search" type="search" placeholder="Search dramas, actors, channels…" autocomplete="off">
+    </div>
+    <div id="bell-wrap">
+      <button id="bell" aria-label="Notifications">🔔<i class="bell-dot"></i></button>
+      <div id="bell-drop">
+        <p class="drop-title">This week on TV</p>
+        <p>🔴 <b>Dar-e-Nijaat</b> — new episode Fri &amp; Sat, 8:00 PM (ARY)</p>
+        <p>🔴 <b>Zanjeerain</b> — new episode Wed &amp; Thu, 8:00 PM (HUM)</p>
+        <p>🔴 <b>Humrahi</b> — new episode Fri &amp; Sat, 8:00 PM (Geo)</p>
+        <p class="drop-note">Timings are Pakistan time and can change — check the channel's schedule.</p>
+      </div>
+    </div>
+    <span class="user-avatar" title="Usman Kalera">U</span>
+  </header>
+
+  <section id="hero">
+    <div class="hero-shade"></div>
+    <div class="hero-content">
+      <span class="live-badge"><i class="pulse"></i>Live • Trending</span>
+      <p id="hero-kicker" class="hero-kicker"></p>
+      <h1 id="hero-title"></h1>
+      <p id="hero-urdu" class="hero-urdu"></p>
+      <div id="hero-meta" class="hero-meta"></div>
+      <div class="hero-actions">
+        <button id="hero-watch" class="btn watch">▶ Watch</button>
+        <button id="hero-list" class="btn ghost">+ My List</button>
+      </div>
+    </div>
+    <div class="hero-switch">
+      <button id="hero-prev" aria-label="Previous">‹</button>
+      <div id="hero-thumbs"></div>
+      <button id="hero-next" aria-label="Next">›</button>
+    </div>
+  </section>
+
+  <section class="row-sec">
+    <div class="sec-head"><h2>Continue Watching</h2><button class="see-all" data-goto="browse">See all ›</button></div>
+    <div id="cw-row" class="row"></div>
+  </section>
+
+  <section class="row-sec">
+    <div class="sec-head"><h2>🔥 Trending Now</h2><button class="see-all" data-goto="trending">See all ›</button></div>
+    <div id="tr-row" class="row rank-row"></div>
+  </section>
+
+  <section class="row-sec" id="all">
+    <div class="sec-head wrap">
+      <div><h2 id="grid-title">All Dramas</h2><span id="grid-count" class="count-sub"></span></div>
+      <select id="sort" aria-label="Sort dramas">
+        <option value="popular">Popular</option>
+        <option value="newest">Newest</option>
+        <option value="az">A – Z</option>
+      </select>
+    </div>
+    <div class="chips">
+      <button class="chip active" data-channel="All">All</button>
+      <button class="chip" data-channel="ARY Digital">ARY Digital</button>
+      <button class="chip" data-channel="HUM TV">HUM TV</button>
+      <button class="chip" data-channel="Geo Entertainment">Geo</button>
+      <button class="chip" data-channel="Green Entertainment">Green</button>
+    </div>
+    <div id="grid" class="grid"></div>
+    <p id="empty" style="display:none">No dramas match that search. Try another name, actor or channel.</p>
+  </section>
+
+  <footer>
+    <p><b>PakDrama</b> — a fan guide to Pakistani dramas. Posters, titles and shows belong to their channels (ARY Digital, HUM TV, Geo Entertainment, Green Entertainment).</p>
+    <p>Watch episodes on the official YouTube channels:
+      <a href="https://www.youtube.com/@ARYDigital" target="_blank" rel="noopener">ARY Digital</a> •
+      <a href="https://www.youtube.com/@HUMTV" target="_blank" rel="noopener">HUM TV</a> •
+      <a href="https://www.youtube.com/@HarPalGeo" target="_blank" rel="noopener">Har Pal Geo</a> •
+      <a href="https://www.youtube.com/@GreenEntertainment" target="_blank" rel="noopener">Green Entertainment</a>
+    </p>
+    <p class="made">Made by Usman Kalera • November 2026</p>
+  </footer>
+</main>
+
+<div id="modal" role="dialog" aria-modal="true">
+  <div class="modal-card">
+    <button id="modal-close" aria-label="Close">✕</button>
+    <div id="modal-body"></div>
+  </div>
+</div>
+
+<div id="toast"></div>
+<script src="app.js"></script>
+<script>
+document.querySelectorAll("[data-goto]").forEach(b => b.addEventListener("click", () => {
+  document.querySelector(`.nav-item[data-view="${b.dataset.goto}"]`).click();
+}));
+</script>
+</body>
+</html>
