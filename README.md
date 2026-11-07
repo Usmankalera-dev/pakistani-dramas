@@ -40,6 +40,10 @@ A Netflix-style catalogue of Pakistani dramas, in the same spirit as
   clicking a card plays its newest episode. The **hero** now drifts slowly
   and shows the episode count + latest episode. Cards zoom on hover, and
   section headings carry a red accent bar.
+- **📅 This Week on TV** — a 7-day schedule strip from the verified air days
+  (today highlighted; tap a drama to open it). **🔔 Follow** an ongoing drama
+  and the bell shows its next airing. The modal suggests **🎭 More like this**
+  from shared cast, and the Actors directory has a **search box**.
 - **Real posters** (downloaded from official channel art and poster sources),
   stored locally in `posters/`.
 - **Watch links go to the channels' official YouTube accounts**

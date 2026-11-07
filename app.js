@@ -221,6 +221,66 @@ function renderNewThisWeek() {
   }).join("");
   $$("#new-row .card").forEach(bindCard);
 }
+function renderSchedule() {
+  const order = [1, 2, 3, 4, 5, 6, 0]; // Mon..Sun
+  const today = new Date().getDay();
+  $("#sched-row").innerHTML = order.map(di => {
+    const list = airingOn(di);
+    return `<div class="sched-day${di === today ? " today" : ""}">
+      <h4>${DAY_ABBR[di]}${di === today ? " · Today" : ""}</h4>
+      ${list.length ? list.map(d => `<button class="sched-drama" data-id="${d.id}"><span class="chan-dot" style="--c:${chanColor(d.channel)}"></span>${esc(d.title)} <small>${esc((d.schedule.split(", ").pop() || ""))}</small></button>`).join("") : `<p class="sched-none">No new episode</p>`}
+    </div>`;
+  }).join("");
+  $$("#sched-row .sched-drama").forEach(b => b.addEventListener("click", () => openModal(b.dataset.id)));
+}
+
+/* ---------- follow reminders (saved in browser) ---------- */
+let followed = [];
+try { followed = JSON.parse(localStorage.getItem("pakdrama-follow") || "[]"); } catch (e) { followed = []; }
+function saveFollowed() { try { localStorage.setItem("pakdrama-follow", JSON.stringify(followed)); } catch (e) {} }
+function isFollowing(id) { return followed.indexOf(id) >= 0; }
+function toggleFollow(id) {
+  const i = followed.indexOf(id);
+  if (i >= 0) followed.splice(i, 1); else followed.push(id);
+  saveFollowed();
+  renderBell();
+}
+function nextAir(d) {
+  if (!d.schedule) return null;
+  const days = DAY_ABBR.map((a, i) => d.schedule.includes(a) ? i : -1).filter(i => i >= 0);
+  if (!days.length) return null;
+  const now = new Date();
+  for (let add = 0; add < 8; add++) {
+    const t = new Date(now.getFullYear(), now.getMonth(), now.getDate() + add, 20, 0, 0);
+    if (days.indexOf(t.getDay()) >= 0 && t.getTime() > now.getTime()) return t;
+  }
+  return null;
+}
+const MONTH_ABBR = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+function fmtAir(t) {
+  if (!t) return "";
+  return DAY_ABBR[t.getDay()] + " " + t.getDate() + " " + MONTH_ABBR[t.getMonth()] + " · 8:00 PM";
+}
+function renderBell() {
+  const drop = $("#bell-drop");
+  const f = followed.map(byId).filter(Boolean);
+  const timings = DRAMAS.filter(d => d.status === "On Air" && d.schedule);
+  drop.innerHTML = `<p class="drop-title">This week on TV</p>` +
+    (f.length
+      ? `<p class="drop-title">🔔 Following</p>` + f.map(d => {
+          const na = nextAir(d);
+          return `<p>🔔 <b>${esc(d.title)}</b> — ${na ? "next episode " + fmtAir(na) : "schedule not listed"} <button class="unfollow" data-id="${d.id}">Unfollow</button></p>`;
+        }).join("")
+      : `<p class="drop-note">Tap 🔔 Follow on an ongoing drama to see its next airing here.</p>`) +
+    timings.map(d => `<p>🔴 <b>${esc(d.title)}</b> — new episode ${esc(d.schedule)} (${esc(d.channel.replace(" Entertainment", "").replace(" Digital", ""))})</p>`).join("") +
+    `<p class="drop-note">Timings are Pakistan time and can change — check the channel's schedule.</p>`;
+  $$("#bell-drop .unfollow").forEach(b => b.addEventListener("click", e => {
+    e.stopPropagation();
+    toggleFollow(b.dataset.id);
+    const fb = $("#modal-follow");
+    if (fb && modalOpen === b.dataset.id) fb.textContent = "🔔 Follow";
+  }));
+}
 function renderStats() {
   const tot = Object.values(EPISODES).reduce((s, e) => s + e.count, 0);
   const insite = Object.values(EPISODES).reduce((s, e) => s + e.eps.filter(ep => ep.v).length, 0);
@@ -345,11 +405,14 @@ function renderGrid() {
   const showChips = state.view !== "actors";
   $("#sort").style.display = showChips ? "" : "none";
   $(".chips").style.display = showChips ? "" : "none";
+  $("#actor-search").style.display = state.view === "actors" ? "" : "none";
   if (state.view === "actors") {
     $("#grid-title").textContent = "Actors";
-    $("#grid-count").textContent = ACTORS.length + " actors";
+    const q = ($("#actor-search").value || "").trim().toLowerCase();
+    const list = q ? ACTORS.filter(a => a.name.toLowerCase().includes(q)) : ACTORS;
+    $("#grid-count").textContent = list.length + " actors";
     $("#empty").style.display = "none";
-    grid.innerHTML = ACTORS.map(actorCardHTML).join("");
+    grid.innerHTML = list.length ? list.map(actorCardHTML).join("") : `<p class="fine" style="grid-column:1/-1">No actor matches "${esc(q)}".</p>`;
     $$("#grid .actor-card").forEach(c => {
       c.addEventListener("click", () => openActor(c.dataset.actor));
       c.addEventListener("keydown", e => { if (e.key === "Enter") openActor(c.dataset.actor); });
@@ -597,6 +660,10 @@ function openModal(id, keep) {
   modalOpen = id;
   const ch = CHANNELS[d.channel];
   const same = DRAMAS.filter(x => x.channel === d.channel && x.id !== id).slice(0, 3);
+  const similar = DRAMAS.filter(x => x.id !== id && x.cast.some(c => d.cast.includes(c)) && !same.some(s => s.id === x.id))
+    .map(x => ({ x, shared: x.cast.filter(c => d.cast.includes(c)).length }))
+    .sort((a, b) => b.shared - a.shared || a.x.rank - b.x.rank)
+    .slice(0, 3).map(o => o.x);
   $("#modal-body").innerHTML = `
     <div class="modal-poster"><img src="${d.poster}" alt="${esc(d.title)} poster" onerror="this.closest('.modal-poster').classList.add('noimg');this.remove();">
       <span class="poster-title">${esc(d.title)}<small>${esc(d.urdu)}</small></span></div>
@@ -616,17 +683,21 @@ function openModal(id, keep) {
         <div class="modal-actions">
           <a class="btn watch" href="${ch.yt}" target="_blank" rel="noopener">▶ Watch on YouTube — ${esc(d.channel)}</a>
           <button class="btn ghost" id="modal-list">${myList.includes(d.id) ? "✓ In My List" : "+ My List"}</button>
+          ${d.status === "On Air" ? `<button class="btn ghost" id="modal-follow">${isFollowing(d.id) ? "✓ Following" : "🔔 Follow"}</button>` : ""}
           <button class="btn ghost" id="modal-share">↗ Share</button>
           <a class="btn ghost" id="modal-wa" href="https://wa.me/?text=${encodeURIComponent("Watch " + d.title + " on PakDrama — " + shareURL(d))}" target="_blank" rel="noopener">WhatsApp</a>
         </div>
         <p class="fine">Episodes air on TV first, then on the channel's official YouTube. This site lists dramas — it does not host episodes.</p>
         ${same.length ? `<h4><img class="chan-logo" src="${ch.logo}" alt=""> More on ${esc(d.channel)}</h4><div class="modal-more">${same.map(x => `<button class="mini" data-id="${x.id}"><img src="${x.poster}" alt="" loading="lazy" onerror="this.remove();"><span>${esc(x.title)}</span></button>`).join("")}</div>` : ""}
+        ${similar.length ? `<h4>🎭 More like this</h4><div class="modal-more">${similar.map(x => `<button class="mini" data-id="${x.id}"><img src="${x.poster}" alt="" loading="lazy" onerror="this.remove();"><span>${esc(x.title)}</span></button>`).join("")}</div>` : ""}
       </div>
       <div class="tab-pane" id="tab-episodes" hidden>${episodesHTML(d)}</div>
     </div>`;
   $("#modal").classList.add("open");
   document.body.style.overflow = "hidden";
   $("#modal-list").onclick = () => toggleList(d.id);
+  const fo = $("#modal-follow");
+  if (fo) fo.onclick = () => { toggleFollow(d.id); fo.textContent = isFollowing(d.id) ? "✓ Following" : "🔔 Follow"; };
   const sh = $("#modal-share");
   if (sh) sh.onclick = () => copyText(shareURL(d));
   try { history.replaceState(null, "", "#" + id); } catch (e) {}
@@ -655,7 +726,10 @@ function init() {
   renderGrid();
   renderTonight();
   renderNewThisWeek();
+  renderSchedule();
+  renderBell();
   renderStats();
+  $("#actor-search").addEventListener("input", () => renderGrid());
   setHero(HERO_IDS[0]);
   $("#hero-thumbs").innerHTML = HERO_IDS.map(id => {
     const d = byId(id);
