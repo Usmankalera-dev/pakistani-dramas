@@ -274,7 +274,7 @@ function episodesHTML(d) {
   const withV = e.eps.filter(ep => ep.v);
   const defEp = withV.length ? (e.status === "ongoing" ? withV[withV.length - 1] : withV[0]) : null;
   const playerHTML = defEp ? `
-    <div class="ep-player">
+    <div class="ep-player" style="background-image:url(${d.poster});background-size:cover;background-position:center">
       <iframe id="ep-player-frame" src="https://www.youtube-nocookie.com/embed/${defEp.v}?rel=0" title="Episode player" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
     </div>
     <p class="ep-now" id="ep-now">Now playing: Episode ${defEp.n}${defEp.d ? " · " + esc(defEp.d) : ""} <a class="ep-yt" href="https://www.youtube.com/watch?v=${defEp.v}" target="_blank" rel="noopener">Open on YouTube ↗</a></p>` : "";
@@ -367,6 +367,10 @@ function openModal(id, keep) {
     $$("#modal-body .tab").forEach(x => x.classList.toggle("active", x === t));
     $("#tab-details").hidden = t.dataset.tab !== "details";
     $("#tab-episodes").hidden = t.dataset.tab !== "episodes";
+    if (t.dataset.tab === "episodes") {
+      const act = $("#tab-episodes .ep-row.active");
+      if (act) act.scrollIntoView({ block: "nearest" });
+    }
   }));
   $$("#modal-body .mini").forEach(b => b.addEventListener("click", () => openModal(b.dataset.id)));
   if (!keep) $("#modal").scrollTop = 0;
@@ -412,9 +416,21 @@ function init() {
   $("#sort").addEventListener("change", e => { state.sort = e.target.value; renderGrid(); });
   $("#search").addEventListener("input", e => {
     state.query = e.target.value.trim();
+    $("#search-clear").style.display = state.query ? "" : "none";
     if (state.view === "mylist" || state.view === "trending" || state.view === "onair") { state.view = "browse"; }
     renderGrid();
   });
+  $("#search-clear").addEventListener("click", () => {
+    $("#search").value = "";
+    state.query = "";
+    $("#search-clear").style.display = "none";
+    renderGrid();
+    $("#search").focus();
+  });
+  window.addEventListener("scroll", () => {
+    $("#to-top").classList.toggle("show", window.scrollY > 600);
+  }, { passive: true });
+  $("#to-top").addEventListener("click", () => window.scrollTo({ top: 0, behavior: "smooth" }));
   $("#bell").addEventListener("click", e => { e.stopPropagation(); $("#bell-drop").classList.toggle("open"); });
   document.addEventListener("click", e => { if (!e.target.closest("#bell-wrap")) $("#bell-drop").classList.remove("open"); });
   $("#modal-close").addEventListener("click", closeModal);
