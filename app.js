@@ -286,6 +286,8 @@ function renderStats() {
   const insite = Object.values(EPISODES).reduce((s, e) => s + e.eps.filter(ep => ep.v).length, 0);
   const chans = [...new Set(DRAMAS.map(d => d.channel))].length;
   $("#stats-bar").innerHTML = `<span><b>${DRAMAS.length}</b> dramas</span><span><b>${tot}</b> episodes</span><span><b>${chans}</b> channels</span><span><b>${insite}</b> play in-site</span>`;
+  const fb = $("#foot-stats");
+  if (fb) fb.innerHTML = `<b>${DRAMAS.length}</b> dramas · <b>${tot}</b> episodes · <b>${chans}</b> channels · <b>${insite}</b> play in-site`;
 }
 
 const state = { view: "browse", query: "", channel: "All", sort: "popular" };
@@ -758,6 +760,29 @@ function init() {
   $("#surprise").addEventListener("click", () => {
     const d = DRAMAS[Math.floor(Math.random() * DRAMAS.length)];
     openModal(d.id);
+    const e = EPISODES[d.id];
+    const withV = e ? e.eps.filter(ep => ep.v) : [];
+    const ep = withV.length ? (e.status === "ongoing" ? withV[withV.length - 1] : withV[0]) : null;
+    if (ep) {
+      const tab = $("#modal-body .tab[data-tab='episodes']");
+      if (tab) tab.click();
+      loadEpisode(ep.v, ep.n, ep.d);
+    }
+  });
+  $$(".foot-nav").forEach(b => b.addEventListener("click", () => {
+    state.view = b.dataset.view;
+    state.query = ""; $("#search").value = "";
+    renderGrid();
+    $("#all").scrollIntoView({ behavior: "smooth" });
+  }));
+  const fs = $("#foot-share");
+  if (fs) fs.onclick = () => copyText(location.origin + location.pathname);
+  const tl = $("#top-logo");
+  if (tl) tl.addEventListener("click", () => {
+    state.view = "browse";
+    state.query = ""; $("#search").value = "";
+    renderGrid();
+    window.scrollTo({ top: 0, behavior: "smooth" });
   });
   setHero(HERO_IDS[0]);
   $("#hero-thumbs").innerHTML = HERO_IDS.map(id => {

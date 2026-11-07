@@ -49,6 +49,12 @@ A Netflix-style catalogue of Pakistani dramas, in the same spirit as
   in the topbar opens a random drama. **📊 My Stats** in My List shows your
   episodes watched, dramas fully watched and ≈ hours. Ongoing dramas show
   their **next episode** date in the modal.
+- **🎲 Surprise me fixed + auto-play** — it now opens a random drama AND
+  starts playing its episode (latest for ongoing, Ep 1 for completed).
+  Assets are versioned (`?v=`) so a new deploy never serves a stale cached
+  file. **Header** has the PakDrama logo in the topbar on phones (tap it to
+  go home) plus a red accent line. **Footer** is now 3 columns — About +
+  Share, Browse links, Channels — with a live stats line.
 - **Real posters** (downloaded from official channel art and poster sources),
   stored locally in `posters/`.
 - **Watch links go to the channels' official YouTube accounts**

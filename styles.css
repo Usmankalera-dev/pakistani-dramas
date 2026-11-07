@@ -381,3 +381,25 @@ footer .made { margin-top: 8px; color: #c9c9d6; }
 .my-rating { color: #f5c518; font-weight: 700; }
 .mylist-stats { color: var(--muted); font-size: 14px; margin: 0 0 12px; }
 .mylist-stats b { color: var(--text); }
+
+/* ---------- upgrade round 7: header + footer ---------- */
+.top-logo { display: none; align-items: center; gap: 8px; background: none; border: 0; cursor: pointer; padding: 0; flex: none; }
+.top-logo .logo-mark { width: 34px; height: 34px; border-radius: 10px; font-size: 13px; }
+.top-logo .logo-text { font-size: 19px; }
+.topbar::after { content: ""; position: absolute; left: 0; right: 0; bottom: -1px; height: 2px;
+  background: linear-gradient(90deg, var(--red), transparent 60%); pointer-events: none; }
+.foot-grid { display: grid; grid-template-columns: 1.4fr 1fr 1fr; gap: 28px; max-width: 1100px; margin: 0 auto; }
+.foot-brand { display: flex; align-items: center; gap: 10px; margin: 0 0 10px; color: #fff; font-size: 18px; }
+.foot-col h4 { margin: 0 0 10px; color: #fff; font-size: 14px; }
+.foot-col a { display: block; color: var(--muted); text-decoration: none; font-size: 13.5px; padding: 3px 0; cursor: pointer; }
+.foot-col a:hover { color: var(--red); }
+.foot-col .btn { margin-top: 10px; }
+.foot-bottom { max-width: 1100px; margin: 24px auto 0; padding-top: 16px; border-top: 1px solid var(--line);
+  display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+.foot-stats { color: var(--muted); font-size: 13px; margin: 0; }
+.foot-stats b { color: #fff; }
+.foot-bottom .made { margin: 0; }
+@media (max-width: 900px) {
+  .top-logo { display: flex; }
+  .foot-grid { grid-template-columns: 1fr; gap: 20px; }
+}
