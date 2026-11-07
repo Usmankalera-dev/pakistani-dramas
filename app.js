@@ -97,7 +97,7 @@ const DRAMAS = [
   { id: "mohabbat", title: "Mohabbat", urdu: "محبت", channel: "Geo Entertainment", year: 2026,
     cast: ["Feroze Khan", "Nawal Saeed", "Aina Asif"], genre: "Family Drama",
     status: "On Air", schedule: "", views: "",
-    synopsis: "A Geo family drama that premiered in September 2026.",
+    synopsis: "A Geo family drama from 2026.",
     poster: "posters/mohabbat.jpg", rank: 18, progress: 0 },
   { id: "muamma", title: "Muamma", urdu: "معمہ", channel: "HUM TV", year: 2026,
     cast: ["Saba Qamar", "Usman Mukhtar", "Ali Ansari"], genre: "Mystery Thriller",
@@ -151,7 +151,7 @@ function cardHTML(d, opts) {
       <h3>${esc(d.title)}</h3>
       <p class="urdu">${esc(d.urdu)}</p>
       <p class="meta"><span class="chan" style="--c:${chanColor(d.channel)}">${esc(d.channel)}</span> • ${d.year}${eps ? ` • <span class="epn">${eps} episode${eps === 1 ? "" : "s"}</span>` : ""}</p>
-      <div class="card-foot">${statusBadge(d)}${d.schedule ? `<span class="sched">${esc(d.schedule)}</span>` : ""}</div>
+      <div class="card-foot">${statusBadge(d)}${d.schedule && d.status === "On Air" ? `<span class="sched">${esc(d.schedule)}</span>` : ""}</div>
     </div>
   </article>`;
 }
@@ -236,6 +236,9 @@ function setHero(id) {
   if (!d) return;
   heroIdx = HERO_IDS.indexOf(id);
   $("#hero").style.backgroundImage = `url(${d.poster})`;
+  $("#hero-badge").innerHTML = d.status === "On Air"
+    ? '<i class="pulse"></i>Live • Trending'
+    : '★ All-time favourite';
   $("#hero-kicker").textContent = `${d.channel} • ${d.year} • ${d.status === "On Air" ? "Trending #" + d.rank : "All-time favourite"}`;
   $("#hero-title").textContent = d.title;
   $("#hero-urdu").textContent = d.urdu;
@@ -266,26 +269,62 @@ function episodesHTML(d) {
   const e = (typeof EPISODES !== "undefined" && EPISODES[d.id]) || null;
   if (!e) return '<p class="fine">Episode list coming soon.</p>';
   const statusLine = e.status === "ongoing"
-    ? "Ongoing — " + e.count + " episodes aired so far" + (e.latest ? " · latest: " + esc(e.latest) : "") + " (checked 7 Nov 2026)"
+    ? "Ongoing — " + e.count + " episodes aired so far" + (e.latest ? " · latest: " + esc(e.latest) : "")
     : "Completed — " + e.count + " episodes";
+  const withV = e.eps.filter(ep => ep.v);
+  const defEp = withV.length ? (e.status === "ongoing" ? withV[withV.length - 1] : withV[0]) : null;
+  const playerHTML = defEp ? `
+    <div class="ep-player">
+      <iframe id="ep-player-frame" src="https://www.youtube-nocookie.com/embed/${defEp.v}?rel=0" title="Episode player" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+    </div>
+    <p class="ep-now" id="ep-now">Now playing: Episode ${defEp.n}${defEp.d ? " · " + esc(defEp.d) : ""} <a class="ep-yt" href="https://www.youtube.com/watch?v=${defEp.v}" target="_blank" rel="noopener">Open on YouTube ↗</a></p>` : "";
   const rows = e.eps.map(ep => {
     const badge = e.status === "ongoing" && ep.n === e.count
       ? '<span class="ep-badge latest">Latest</span>'
       : (e.status === "completed" && ep.n === e.count ? '<span class="ep-badge">Finale</span>' : "");
     const title = ep.t ? " — " + esc(ep.t) : "";
-    return `<a class="ep-row" href="${ytEpURL(d, ep.n)}" target="_blank" rel="noopener">
-      <span class="ep-num">${ep.n}</span>
+    const date = ep.d ? `<span class="ep-date">${esc(ep.d)}</span>` : "";
+    const inner = `<span class="ep-num">${ep.n}</span>
       <span class="ep-name">Episode ${ep.n}${title}</span>
-      ${badge}
-      ${ep.d ? `<span class="ep-date">${esc(ep.d)}</span>` : ""}
-      <span class="ep-play" aria-label="Watch episode">▶</span></a>`;
+      ${badge}${date}`;
+    if (ep.v) {
+      return `<button class="ep-row${defEp && ep.n === defEp.n ? " active" : ""}" data-vid="${ep.v}" data-n="${ep.n}" data-d="${esc(ep.d || "")}">${inner}
+      <span class="ep-play" aria-label="Play episode">▶</span></button>`;
+    }
+    return `<a class="ep-row" href="${ytEpURL(d, ep.n)}" target="_blank" rel="noopener">${inner}
+      <span class="ep-play" aria-label="Watch episode">↗</span></a>`;
   }).join("");
-  return `<div class="ep-head">
-      <p><b>${e.count} episodes</b> · ${statusLine}</p>
-      <a class="btn watch ep-all" href="${ytAllURL(d)}" target="_blank" rel="noopener">▶ Watch all on YouTube</a>
+  const playAll = e.p
+    ? `<button class="btn watch ep-all" id="ep-playall" data-pl="${e.p}">▶ Play all episodes</button>`
+    : `<a class="btn watch ep-all" href="${ytAllURL(d)}" target="_blank" rel="noopener">▶ Watch all on YouTube</a>`;
+  return `${playerHTML}
+    <div class="ep-head">
+      <p>${statusLine}</p>
+      ${playAll}
     </div>
     <div class="ep-list">${rows}</div>
-    <p class="fine">Each episode opens as a YouTube search on the channel's official uploads — this site does not host episodes. Air dates are shown only where verified.</p>`;
+    <p class="fine">Episodes play right here, from the channel's official YouTube uploads — this site does not host episodes. A row marked ↗ has no official video linked yet, so it opens a YouTube search instead. Air dates are shown only where verified. Episode list checked 7 Nov 2026.</p>`;
+}
+
+function loadEpisode(vid, n, d) {
+  const f = $("#ep-player-frame");
+  if (!f) return;
+  f.src = "https://www.youtube-nocookie.com/embed/" + vid + "?autoplay=1&rel=0";
+  const now = $("#ep-now");
+  if (now) now.innerHTML = "Now playing: Episode " + n + (d ? " · " + esc(d) : "") +
+    ' <a class="ep-yt" href="https://www.youtube.com/watch?v=' + vid + '" target="_blank" rel="noopener">Open on YouTube ↗</a>';
+  $$("#modal-body .ep-row").forEach(r => r.classList.toggle("active", r.dataset.vid === vid));
+  f.scrollIntoView({ behavior: "smooth", block: "nearest" });
+}
+function loadPlaylist(pl) {
+  const f = $("#ep-player-frame");
+  if (!f) return;
+  f.src = "https://www.youtube-nocookie.com/embed?listType=playlist&list=" + pl + "&autoplay=1&rel=0";
+  const now = $("#ep-now");
+  if (now) now.innerHTML = 'Now playing: full playlist — all episodes, in order.' +
+    ' <a class="ep-yt" href="https://www.youtube.com/playlist?list=' + pl + '" target="_blank" rel="noopener">Open playlist on YouTube ↗</a>';
+  $$("#modal-body .ep-row").forEach(r => r.classList.remove("active"));
+  f.scrollIntoView({ behavior: "smooth", block: "nearest" });
 }
 
 /* ---------- modal ---------- */
@@ -308,7 +347,7 @@ function openModal(id, keep) {
         <button class="tab" data-tab="episodes">Episodes <span class="ep-count">${epCount(d.id)}</span></button>
       </div>
       <div class="tab-pane" id="tab-details">
-        ${d.schedule ? `<p class="line"><b>Airs:</b> ${esc(d.schedule)} (Pakistan time)</p>` : ""}
+        ${d.schedule ? `<p class="line"><b>${d.status === "On Air" ? "Airs" : "Aired"}:</b> ${esc(d.schedule)} (Pakistan time)</p>` : ""}
         ${d.cast.length ? `<p class="line"><b>Cast:</b> ${d.cast.map(esc).join(", ")}</p>` : ""}
         ${d.views ? `<p class="line"><b>Buzz:</b> ${esc(d.views)}</p>` : ""}
         <p class="syn">${esc(d.synopsis)}</p>
@@ -380,6 +419,13 @@ function init() {
   document.addEventListener("click", e => { if (!e.target.closest("#bell-wrap")) $("#bell-drop").classList.remove("open"); });
   $("#modal-close").addEventListener("click", closeModal);
   $("#modal").addEventListener("click", e => { if (e.target.id === "modal") closeModal(); });
+  // in-site episode player: rows with a video id load it into the player
+  $("#modal-body").addEventListener("click", e => {
+    const row = e.target.closest(".ep-row[data-vid]");
+    if (row) { loadEpisode(row.dataset.vid, row.dataset.n, row.dataset.d); return; }
+    const all = e.target.closest("#ep-playall");
+    if (all) loadPlaylist(all.dataset.pl);
+  });
   document.addEventListener("keydown", e => { if (e.key === "Escape") closeModal(); });
   $("#menu-btn").addEventListener("click", () => $("#sidebar").classList.add("open"));
   $("#drawer-close").addEventListener("click", closeDrawer);

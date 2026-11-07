@@ -12,9 +12,14 @@ A Netflix-style catalogue of Pakistani dramas, in the same spirit as
 - **Full episode lists — 702 episodes across all 20 dramas** (checked 7 Nov 2026).
   Every drama's detail popup has an **Episodes** tab: every episode number,
   air date where verified (TVmaze, Wikipedia, Moviefone, harpalgeo.tv, official
-  YouTube descriptions), a Latest/Finale badge, and a ▶ link per episode that
-  opens a YouTube search on the channel's official uploads. Ongoing shows list
-  the episodes aired so far.
+  YouTube descriptions), a Latest/Finale badge. **Episodes play inside the site:**
+  295 of 702 episodes have a verified official YouTube video id and open in an
+  in-site player (8 dramas fully covered — Dar-e-Nijaat, Kafeel, Shar Pasand,
+  Bas Tera Saath Ho, Meem Se Mohabbat, Ishq Murshid, Muamma, Case No. 9 — plus
+  the newest verified episodes of Nashtar, Mitti De Baway, Hurmat and Mohabbat),
+  with a "Play all episodes" button that plays the channel's official playlist.
+  Rows without a verified video (marked ↗) open a YouTube search on the
+  channel's official uploads instead. Ongoing shows list the episodes aired so far.
 - **Search, channel filter, sort** (Popular / Newest / A–Z), **My List**
   (saved in the browser), drama detail popups, hero switcher, notification panel
   with the week's TV timings.
